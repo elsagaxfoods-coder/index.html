@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panchito Shoes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="max-w-md mx-auto p-4">
+        
+        <!-- HEADER -->
+        <div class="flex justify-between items-center bg-white p-4 rounded-t-xl shadow">
+            <h1 class="text-xl font-bold">Panchito Shoes</h1>
+            <button onclick="menuConfig()" class="text-2xl">⚙️</button>
+        </div>
+
+        <!-- PANTALLA 1: LOGIN -->
+        <div id="p-login" class="bg-white p-6 rounded-b-xl shadow border-t">
+            <div id="img-container" class="text-center mb-4">
+                <img id="logo-img" class="w-24 h-24 mx-auto rounded-full hidden border">
+            </div>
+            <input type="text" id="vendedor" placeholder="Tu nombre" class="w-full p-3 border rounded mb-4 outline-none focus:ring-2 focus:ring-blue-500">
+            <button onclick="entrar()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold">ENTRAR AL CATÁLOGO</button>
+        </div>
+
+        <!-- PANTALLA 2: CATÁLOGO -->
+        <div id="p-catalogo" class="hidden py-4">
+            <div class="bg-blue-600 text-white p-3 rounded-lg mb-4 flex justify-between items-center shadow">
+                <span id="nom-vendedor" class="font-bold"></span>
+                <button onclick="verCarrito()" class="bg-yellow-500 text-black px-3 py-1 rounded-full text-sm font-bold">🛒 <span id="cont">0</span></button>
+            </div>
+            <img id="banner-img" class="w-full h-32 object-cover rounded-lg mb-4 hidden shadow">
+            <div id="lista-prods" class="space-y-4"></div>
+        </div>
+
+        <!-- PANTALLA 3: CARRITO -->
+        <div id="p-carrito" class="hidden bg-white p-6 rounded-xl shadow">
+            <h2 class="text-xl font-bold mb-4">Resumen de Pedido</h2>
+            <div id="items-car" class="mb-6 space-y-2"></div>
+            <button onclick="enviarPedido()" class="w-full bg-green-600 text-white py-4 rounded-lg font-bold mb-3 shadow">ENVIAR A EXCEL</button>
+            <button onclick="volver()" class="w-full text-gray-500 py-2">Volver</button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- LÓGICA DE DATOS ---
+        let urlScript = localStorage.getItem('panchito_url') || "";
+        let inventario = {};
+        let carrito = [];
+
+        // --- NAVEGACIÓN ---
+        function entrar() {
+            const v = document.getElementById('vendedor').value;
+            if(!v) return alert("Escribe tu nombre");
+            if(!urlScript) return alert("Falta configurar la URL en el engranaje");
+            
+            fetch(urlScript)
+                .then(r => r.json())
+                .then(data => {
+                    inventario = data.inventario;
+                    if(data.visuales.logo) { document.getElementById('logo-img').src = data.visuales.logo; document.getElementById('logo-img').classList.remove('hidden'); }
+                    if(data.visuales.banner) { document.getElementById('banner-img').src = data.visuales.banner; document.getElementById('banner-img').classList.remove('hidden'); }
+                    
+                    document.getElementById('nom-vendedor').innerText = v;
+                    renderProds();
+                    document.getElementById('p-login').classList.add('hidden');
+                    document.getElementById('p-catalogo').classList.remove('hidden');
+                })
+                .catch(e => alert("Error al conectar con Google. Verifica la URL."));
+        }
+
+        function menuConfig() {
+            const p = prompt("Clave:");
+            if(p === "1234") {
+                const u = prompt("Pega la URL de Google Script:", urlScript);
+                if(u) {
+                    localStorage.setItem('panchito_url', u.trim());
+                    location.reload();
+                }
+            }
+        }
+
+        // --- PRODUCTOS ---
+        function renderProds() {
+            const div = document.getElementById('lista-prods');
+            div.innerHTML = "";
+            for(let m in inventario) {
+                const p = inventario[m];
+                div.innerHTML += `
+                    <div class="bg-white p-4 rounded-xl shadow border">
+                        <p class="font-bold text-lg">${m}</p>
+                        <div class="flex gap-2 my-2">
+                            <select id="t-${m}" class="flex-1 p-2 border rounded">${p.tallas.map(t=>`<option>${t}</option>`).join('')}</select>
+                            <select id="c-${m}" class="flex-1 p-2 border rounded">${p.colores.map(c=>`<option>${c}</option>`).join('')}</select>
+                        </div>
+                        <input type="number" id="n-${m}" value="1" class="w-full p-2 border rounded mb-2">
+                        <button onclick="add('${m}')" class="w-full bg-blue-500 text-white py-2 rounded font-bold">AGREGAR</button>
+                    </div>`;
+            }
+        }
+
+        function add(m) {
+            const t = document.getElementById('t-'+m).value;
+            const c = document.getElementById('c-'+m).value;
+            const n = document.getElementById('n-'+m).value;
+            carrito.push({m, t, c, n});
+            document.getElementById('cont').innerText = carrito.length;
+            alert("Añadido!");
+        }
+
+        // --- CARRITO ---
+        function verCarrito() {
+            if(carrito.length === 0) return alert("Carrito vacío");
+            document.getElementById('p-catalogo').classList.add('hidden');
+            document.getElementById('p-carrito').classList.remove('hidden');
+            const d = document.getElementById('items-car');
+            d.innerHTML = carrito.map((i, idx) => `<div class="flex justify-between border-b py-2"><span>${i.m} (T:${i.t} C:${i.c}) x${i.n}</span><button onclick="borrar(${idx})" class="text-red-500">Eliminar</button></div>`).join('');
+        }
+
+        function borrar(idx) {
+            carrito.splice(idx, 1);
+            document.getElementById('cont').innerText = carrito.length;
+            if(carrito.length === 0) volver(); else verCarrito();
+        }
+
+        function volver() {
+            document.getElementById('p-carrito').classList.add('hidden');
+            document.getElementById('p-catalogo').classList.remove('hidden');
+        }
+
+        async function enviarPedido() {
+            const v = document.getElementById('vendedor').value;
+            try {
+                await fetch(urlScript, { method:"POST", mode:"no-cors", body: JSON.stringify({vendedor: v, carrito: carrito}) });
+                alert("PEDIDO ENVIADO CON ÉXITO");
+                location.reload();
+            } catch(e) { alert("Error al enviar"); }
+        }
+    </script>
+</body>
+</html>
