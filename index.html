@@ -3,91 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panchito Shoes - Pedidos</title>
+    <title>Panchito Shoes</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .logo-sticky { width: 50px; height: 50px; object-fit: cover; border-radius: 50%; border: 2px solid #3b82f6; }
+        .banner-publicitario { width: 100%; max-height: 150px; object-fit: cover; border-radius: 12px; display: none; }
+    </style>
 </head>
 <body class="bg-gray-100 font-sans">
 
     <div class="max-w-md mx-auto min-h-screen flex flex-col">
         
-        <!-- HEADER -->
-        <div class="flex justify-between items-center bg-white p-4 shadow-md sticky top-0 z-10">
-            <h1 class="text-xl font-black text-blue-700">PANCHITO SHOES</h1>
+        <!-- HEADER (LOGO SIEMPRE VISIBLE) -->
+        <div class="flex justify-between items-center bg-white p-4 shadow-md sticky top-0 z-50">
+            <div class="flex items-center gap-3">
+                <img id="global-logo" src="" alt="Logo" class="logo-sticky hidden">
+                <h1 class="text-xl font-black text-blue-700">PANCHITO</h1>
+            </div>
             <div class="flex gap-4 items-center">
                 <button onclick="verCarrito()" class="relative bg-blue-100 p-2 rounded-full">
                     🛒 <span id="cont" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
                 </button>
-                <button onclick="menuConfig()" class="text-xl">⚙️</button>
+                <button onclick="menuConfig()" class="text-xl text-gray-400">⚙️</button>
             </div>
         </div>
 
         <!-- PANTALLA 1: LOGIN -->
-        <div id="p-login" class="flex-grow flex items-center justify-center p-6">
+        <div id="p-login" class="flex-grow flex flex-col items-center justify-center p-6">
+            <img id="login-logo" src="" class="w-32 h-32 rounded-full mb-6 shadow-lg hidden">
             <div class="bg-white p-8 rounded-2xl shadow-xl w-full text-center border">
-                <div id="img-container" class="mb-6">
-                    <img id="logo-img" class="w-24 h-24 mx-auto rounded-full border-4 border-blue-500 hidden">
-                </div>
-                <h2 class="text-gray-500 mb-4 uppercase tracking-widest text-sm">Registro de Vendedor</h2>
-                <input type="text" id="vendedor" placeholder="Ingresa tu nombre" class="w-full p-4 border-2 rounded-xl mb-4 outline-none focus:border-blue-500 transition-all">
-                <button onclick="entrar()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold shadow-lg transition-transform active:scale-95">
-                    ABRIR CATÁLOGO
+                <h2 class="text-gray-500 mb-4 uppercase tracking-widest text-sm font-bold">Identificación</h2>
+                <input type="text" id="vendedor" placeholder="Tu nombre" class="w-full p-4 border-2 rounded-xl mb-4 outline-none focus:border-blue-500">
+                <button onclick="entrar()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold shadow-lg active:scale-95 transition-transform">
+                    INGRESAR
                 </button>
             </div>
         </div>
 
-        <!-- PANTALLA 2: CATÁLOGO (MENÚ DESPLEGABLE) -->
+        <!-- PANTALLA 2: CATÁLOGO -->
         <div id="p-catalogo" class="hidden p-4 animate-fadeIn">
-            <div id="saludo" class="bg-blue-600 text-white p-4 rounded-xl mb-6 shadow-md">
-                <p class="text-sm opacity-80">Bienvenido,</p>
-                <p id="nom-vendedor" class="text-lg font-bold"></p>
-            </div>
+            <!-- BANNER DINÁMICO -->
+            <img id="banner-publicitario" src="" alt="Publicidad" class="banner-publicitario mb-6 shadow-md">
 
             <div class="bg-white p-6 rounded-2xl shadow border mb-6">
-                <label class="block text-gray-700 font-bold mb-2">Selecciona un Modelo:</label>
-                <select id="selector-modelo" onchange="actualizarOpciones()" class="w-full p-4 bg-gray-50 border-2 rounded-xl mb-4 focus:border-blue-500 outline-none">
+                <label class="block text-gray-700 font-bold mb-2 uppercase text-xs">Selecciona Modelo:</label>
+                <select id="selector-modelo" onchange="actualizarOpciones()" class="w-full p-4 bg-gray-50 border-2 rounded-xl mb-4 outline-none focus:border-blue-500">
                     <option value="">-- Elige un calzado --</option>
                 </select>
 
                 <div id="opciones-modelo" class="hidden space-y-4 border-t pt-4">
-                    <div class="flex gap-4">
-                        <div class="flex-1">
-                            <label class="text-xs font-bold text-gray-400 uppercase">Talla</label>
-                            <select id="t-sel" class="w-full p-3 border rounded-lg"></select>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase">Talla</label>
+                            <select id="t-sel" class="w-full p-3 border rounded-lg bg-white"></select>
                         </div>
-                        <div class="flex-1">
-                            <label class="text-xs font-bold text-gray-400 uppercase">Color</label>
-                            <select id="c-sel" class="w-full p-3 border rounded-lg"></select>
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase">Color</label>
+                            <select id="c-sel" class="w-full p-3 border rounded-lg bg-white"></select>
                         </div>
                     </div>
                     <div>
-                        <label class="text-xs font-bold text-gray-400 uppercase">Cantidad</label>
-                        <input type="number" id="n-sel" value="1" min="1" class="w-full p-3 border rounded-lg">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase">Cantidad</label>
+                        <input type="number" id="n-sel" value="1" min="1" class="w-full p-3 border rounded-lg bg-white">
                     </div>
-                    <button onclick="add()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-4 rounded-xl font-bold shadow-md">
-                        AÑADIR AL CARRITO
+                    <button onclick="add()" class="w-full bg-yellow-500 text-white py-4 rounded-xl font-bold shadow-md active:bg-yellow-600">
+                        AGREGAR AL PEDIDO
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- PANTALLA 3: RESUMEN CARRITO -->
-        <div id="p-carrito" class="hidden flex-grow p-4">
-            <div class="bg-white p-6 rounded-2xl shadow-xl border min-h-[400px] flex flex-col">
-                <h2 class="text-xl font-black mb-6 border-b pb-2 text-gray-800">TU PEDIDO</h2>
-                <div id="items-car" class="flex-grow space-y-4 overflow-y-auto">
-                    <!-- Los items se cargan aquí -->
-                </div>
-                <div class="mt-6 pt-6 border-t">
-                    <button onclick="enviarPedido()" class="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg mb-4">
-                        FINALIZAR Y ENVIAR
-                    </button>
-                    <button onclick="volver()" class="w-full text-gray-500 font-medium py-2">
-                        ← Seguir comprando
-                    </button>
+        <!-- PANTALLA 3: CARRITO -->
+        <div id="p-carrito" class="hidden p-4 flex-grow">
+            <div class="bg-white p-6 rounded-2xl shadow-xl border flex flex-col h-full">
+                <h2 class="text-xl font-black mb-6 border-b pb-2">MI PEDIDO</h2>
+                <div id="items-car" class="flex-grow space-y-4 overflow-y-auto"></div>
+                <div class="mt-6">
+                    <button onclick="enviarPedido()" class="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg">ENVIAR A EXCEL</button>
+                    <button onclick="volver()" class="w-full text-gray-500 py-4 font-medium">← Volver al catálogo</button>
                 </div>
             </div>
         </div>
-
     </div>
 
     <script>
@@ -97,44 +93,49 @@
 
         function entrar() {
             const v = document.getElementById('vendedor').value;
-            if(!v) return alert("Por favor, ingresa tu nombre.");
-            if(!urlScript) return alert("Configura la URL de Google Script en el icono de engranaje.");
+            if(!v) return alert("Ingresa tu nombre");
+            if(!urlScript) return alert("Falta configurar la URL");
 
             fetch(urlScript)
                 .then(r => r.json())
                 .then(data => {
                     inventario = data.inventario;
-                    
-                    // Llenar el menú desplegable de modelos
+
+                    // Cargar imágenes desde Google Sheets
+                    if(data.visuales.logo) {
+                        const logoG = document.getElementById('global-logo');
+                        const logoL = document.getElementById('login-logo');
+                        logoG.src = logoL.src = data.visuales.logo;
+                        logoG.classList.remove('hidden');
+                        logoL.classList.remove('hidden');
+                    }
+                    if(data.visuales.banner) {
+                        const ban = document.getElementById('banner-publicitario');
+                        ban.src = data.visuales.banner;
+                        ban.style.display = 'block';
+                    }
+
+                    // Llenar modelos
                     const selector = document.getElementById('selector-modelo');
                     selector.innerHTML = '<option value="">-- Elige un calzado --</option>';
                     Object.keys(inventario).forEach(m => {
                         selector.innerHTML += `<option value="${m}">${m}</option>`;
                     });
 
-                    document.getElementById('nom-vendedor').innerText = v;
                     document.getElementById('p-login').classList.add('hidden');
                     document.getElementById('p-catalogo').classList.remove('hidden');
                 })
-                .catch(e => alert("Error de conexión. Revisa la URL del Script."));
+                .catch(e => alert("Error al conectar. Revisa la URL y las imágenes."));
         }
 
         function actualizarOpciones() {
-            const modelo = document.getElementById('selector-modelo').value;
+            const mod = document.getElementById('selector-modelo').value;
             const panel = document.getElementById('opciones-modelo');
-            
-            if(!modelo) {
-                panel.classList.add('hidden');
-                return;
-            }
+            if(!mod) return panel.classList.add('hidden');
 
-            const datos = inventario[modelo];
-            const tSel = document.getElementById('t-sel');
-            const cSel = document.getElementById('c-sel');
-
-            tSel.innerHTML = datos.tallas.map(t => `<option value="${t}">${t}</option>`).join('');
-            cSel.innerHTML = datos.colores.map(c => `<option value="${c}">${c}</option>`).join('');
-            
+            const d = inventario[mod];
+            document.getElementById('t-sel').innerHTML = d.tallas.map(t => `<option>${t}</option>`).join('');
+            document.getElementById('c-sel').innerHTML = d.colores.map(c => `<option>${c}</option>`).join('');
             panel.classList.remove('hidden');
         }
 
@@ -143,41 +144,26 @@
             const t = document.getElementById('t-sel').value;
             const c = document.getElementById('c-sel').value;
             const n = document.getElementById('n-sel').value;
-
-            if(n < 1) return alert("La cantidad debe ser al menos 1");
-
             carrito.push({m, t, c, n});
             document.getElementById('cont').innerText = carrito.length;
-            
-            // Resetear para siguiente selección
+            alert("¡Agregado!");
             document.getElementById('selector-modelo').value = "";
             document.getElementById('opciones-modelo').classList.add('hidden');
-            document.getElementById('n-sel').value = 1;
-            
-            alert("¡Agregado al carrito!");
         }
 
         function verCarrito() {
-            if(carrito.length === 0) return alert("El carrito está vacío");
-            
+            if(carrito.length === 0) return alert("Vacío");
             document.getElementById('p-catalogo').classList.add('hidden');
-            document.getElementById('p-login').classList.add('hidden');
             document.getElementById('p-carrito').classList.remove('hidden');
-
-            const lista = document.getElementById('items-car');
-            lista.innerHTML = carrito.map((i, index) => `
-                <div class="flex justify-between items-center bg-gray-50 p-4 rounded-xl border">
-                    <div>
-                        <p class="font-bold text-gray-800">${i.m}</p>
-                        <p class="text-sm text-gray-500">Talla: ${i.t} | Color: ${i.c} | Cant: ${i.n}</p>
-                    </div>
-                    <button onclick="eliminar(${index})" class="text-red-500 bg-red-50 p-2 rounded-lg">🗑️</button>
-                </div>
-            `).join('');
+            document.getElementById('items-car').innerHTML = carrito.map((i, x) => `
+                <div class="flex justify-between items-center p-3 border-b">
+                    <div><b>${i.m}</b><br><small>T:${i.t} C:${i.c} x${i.n}</small></div>
+                    <button onclick="borrar(${x})" class="text-red-500">❌</button>
+                </div>`).join('');
         }
 
-        function eliminar(idx) {
-            carrito.splice(idx, 1);
+        function borrar(x) {
+            carrito.splice(x, 1);
             document.getElementById('cont').innerText = carrito.length;
             if(carrito.length === 0) volver(); else verCarrito();
         }
@@ -188,48 +174,19 @@
         }
 
         function menuConfig() {
-            const p = prompt("Clave de acceso:");
+            const p = prompt("Clave:");
             if(p === "1234") {
-                const u = prompt("URL de Google Apps Script:", urlScript);
-                if(u) {
-                    localStorage.setItem('panchito_url', u.trim());
-                    location.reload();
-                }
+                const u = prompt("URL Script:", urlScript);
+                if(u) { localStorage.setItem('panchito_url', u.trim()); location.reload(); }
             }
         }
 
         async function enviarPedido() {
             const v = document.getElementById('vendedor').value;
-            const btn = event.target;
-            btn.disabled = true;
-            btn.innerText = "ENVIANDO...";
-
-            try {
-                await fetch(urlScript, {
-                    method: "POST",
-                    mode: "no-cors",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({vendedor: v, carrito: carrito})
-                });
-                alert("✅ PEDIDO ENVIADO CON ÉXITO");
-                carrito = [];
-                location.reload();
-            } catch(e) {
-                alert("Error al enviar el pedido");
-                btn.disabled = false;
-                btn.innerText = "FINALIZAR Y ENVIAR";
-            }
+            await fetch(urlScript, {method:"POST", mode:"no-cors", body: JSON.stringify({vendedor:v, carrito:carrito})});
+            alert("PEDIDO ENVIADO");
+            location.reload();
         }
     </script>
-
-    <style>
-        .animate-fadeIn {
-            animation: fadeIn 0.3s ease-in;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
 </body>
 </html>
