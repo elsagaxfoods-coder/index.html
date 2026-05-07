@@ -3,31 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panchito Shoes - Black & Orange</title>
+    <title>Panchito Shoes - Pedidos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Estilos personalizados para la paleta Negro y Naranja */
         .logo-img { width: 48px; height: 48px; object-fit: cover; border-radius: 50%; border: 2px solid #f97316; }
         .banner-img { width: 100%; height: 150px; object-fit: cover; border-radius: 16px; display: none; border: 1px solid #334155; }
-        .bg-dark-app { background-color: #0f172a; } /* Azul oscuro/negro para profundidad */
+        .bg-dark-app { background-color: #0f172a; }
         .card-dark { background-color: #1e293b; border: 1px solid #334155; }
         .btn-orange { background-color: #f97316; transition: all 0.2s ease; }
-        .btn-orange:hover { background-color: #ea580c; transform: translateY(-1px); }
-        .btn-orange:active { transform: scale(0.96); }
+        .btn-orange:hover { background-color: #ea580c; }
         .text-orange { color: #f97316; }
-        
-        /* Animación suave */
         .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="bg-dark-app text-slate-100 font-sans">
 
-    <!-- HEADER SUPERIOR -->
     <header class="bg-[#1e293b] shadow-xl sticky top-0 z-50 p-4 border-b border-slate-700">
         <div class="max-w-md mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <img id="app-logo" src="" class="logo-img hidden" alt="Logo">
+                <img id="app-logo" src="" class="logo-img hidden">
                 <h1 class="font-black text-xl tracking-tighter text-white">PANCHITO<span class="text-orange">SHOES</span></h1>
             </div>
             <div class="flex items-center gap-4">
@@ -42,30 +37,34 @@
 
     <main class="max-w-md mx-auto p-4 pb-20">
 
-        <!-- PANTALLA 1: LOGIN -->
+        <!-- LOGIN -->
         <section id="p-login" class="fade-in mt-12">
             <div class="card-dark rounded-3xl p-8 shadow-2xl text-center">
-                <img id="login-logo" src="" class="w-28 h-28 mx-auto rounded-full mb-6 hidden shadow-[0_0_15px_rgba(249,115,22,0.3)] border-2 border-orange">
-                <h2 class="text-2xl font-bold mb-2">Bienvenido</h2>
-                <p class="text-slate-400 text-sm mb-8 italic">Ingresa al sistema de pedidos</p>
-                <input type="text" id="user" placeholder="Nombre del Vendedor" class="w-full bg-slate-900 border-2 border-slate-700 p-4 rounded-2xl mb-5 outline-none focus:border-orange transition-all text-white">
-                <button onclick="init()" class="w-full btn-orange text-white py-4 rounded-2xl font-black shadow-lg shadow-orange-900/20 uppercase tracking-widest">
-                    EMPEZAR
-                </button>
+                <img id="login-logo" src="" class="w-28 h-28 mx-auto rounded-full mb-6 hidden border-2 border-orange">
+                <h2 class="text-2xl font-bold mb-8">Panel de Ventas</h2>
+                <input type="text" id="user" placeholder="Nombre del Vendedor" class="w-full bg-slate-900 border-2 border-slate-700 p-4 rounded-2xl mb-5 outline-none focus:border-orange text-white">
+                <button onclick="init()" class="w-full btn-orange text-white py-4 rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-orange-900/20">EMPEZAR</button>
             </div>
         </section>
 
-        <!-- PANTALLA 2: CATALOGO (Menú Desplegable) -->
+        <!-- CATALOGO -->
         <section id="p-catalogo" class="hidden fade-in">
-            <img id="app-banner" src="" class="banner-img shadow-2xl mb-6" alt="Promo">
+            <img id="app-banner" src="" class="banner-img shadow-2xl mb-6">
             
             <div class="card-dark rounded-3xl p-6 shadow-lg mb-6">
-                <label class="block text-[10px] font-black text-orange uppercase tracking-[0.2em] mb-3">Modelos Disponibles</label>
-                <select id="sel-modelo" onchange="loadOptions()" class="w-full p-4 bg-slate-900 border-2 border-slate-700 rounded-2xl outline-none focus:border-orange text-white appearance-none">
+                <label class="block text-[10px] font-black text-orange uppercase tracking-[0.2em] mb-3">Modelo</label>
+                <select id="sel-modelo" onchange="loadOptions()" class="w-full p-4 bg-slate-900 border-2 border-slate-700 rounded-2xl outline-none focus:border-orange text-white mb-6">
                     <option value="">-- Selecciona Calzado --</option>
                 </select>
 
-                <div id="options-area" class="hidden mt-8 pt-8 border-t border-slate-700 space-y-5">
+                <div id="options-area" class="hidden space-y-5 pt-6 border-t border-slate-700">
+                    
+                    <!-- SELECTOR DE TIPO -->
+                    <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-700">
+                        <button onclick="setTipo('Normal')" id="btn-normal" class="flex-1 py-2 rounded-lg font-bold text-xs transition-all bg-orange text-white">NORMAL</button>
+                        <button onclick="setTipo('Personalizado')" id="btn-perso" class="flex-1 py-2 rounded-lg font-bold text-xs transition-all text-slate-500">PERSONALIZADO</button>
+                    </div>
+
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <span class="text-[10px] font-bold text-slate-400 uppercase ml-2">Talla</span>
@@ -78,34 +77,21 @@
                     </div>
                     <div>
                         <span class="text-[10px] font-bold text-slate-400 uppercase ml-2">Cantidad</span>
-                        <input type="number" id="sel-cant" value="1" min="1" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl font-bold text-orange text-lg text-center">
+                        <input type="number" id="sel-cant" value="1" min="1" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl font-bold text-orange text-center text-lg">
                     </div>
-                    <button onclick="addToCart()" class="w-full btn-orange text-white py-4 rounded-2xl font-black shadow-lg uppercase tracking-wide">
-                        AGREGAR AL PEDIDO
-                    </button>
+                    <button onclick="addToCart()" class="w-full btn-orange text-white py-4 rounded-2xl font-black uppercase tracking-wide">AGREGAR AL PEDIDO</button>
                 </div>
             </div>
         </section>
 
-        <!-- PANTALLA 3: CARRITO -->
+        <!-- CARRITO -->
         <section id="p-carrito" class="hidden fade-in">
             <div class="card-dark rounded-3xl p-6 shadow-2xl flex flex-col min-h-[450px]">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-xl font-black text-white italic">TU LISTA</h2>
-                    <span class="bg-orange/10 text-orange border border-orange/20 px-3 py-1 rounded-lg text-xs font-bold" id="res-vendedor"></span>
-                </div>
-                
-                <div id="cart-list" class="flex-grow space-y-3 overflow-y-auto max-h-[380px] pr-2">
-                    <!-- Los items aparecen aquí -->
-                </div>
-
+                <h2 class="text-xl font-black italic mb-6 border-b border-slate-700 pb-2">TU LISTA</h2>
+                <div id="cart-list" class="flex-grow space-y-3 overflow-y-auto"></div>
                 <div class="mt-8 space-y-4">
-                    <button onclick="sendOrder()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-4 rounded-2xl font-black text-lg shadow-lg uppercase transition-all">
-                        FINALIZAR PEDIDO
-                    </button>
-                    <button onclick="back()" class="w-full text-slate-500 font-bold py-2 hover:text-white transition-colors">
-                        ← Regresar al catálogo
-                    </button>
+                    <button onclick="sendOrder()" class="w-full bg-emerald-600 text-white py-4 rounded-2xl font-black text-lg shadow-lg uppercase">ENVIAR PEDIDO</button>
+                    <button onclick="back()" class="w-full text-slate-500 font-bold py-2">← Regresar</button>
                 </div>
             </div>
         </section>
@@ -113,133 +99,79 @@
     </main>
 
     <script>
-        // Lógica de funcionamiento (Misma que la anterior, adaptada a la nueva UI)
         let scriptURL = localStorage.getItem('panchito_url') || "";
         let db = {};
         let cart = [];
+        let tipoActual = "Normal";
 
-    function init() {
-    const user = document.getElementById('user').value;
-    if(!user) return alert("Por favor, ingresa tu nombre.");
-    if(!scriptURL) return alert("Falta configurar la URL (⚙️)");
-
-    // Limpiamos la URL por si tiene espacios o errores de copiado
-    const finalURL = scriptURL.trim();
-
-    fetch(finalURL, {
-        method: "GET",
-        mode: "cors", // Cambiamos a cors explícito
-        redirect: "follow" // ESTO ES LO MÁS IMPORTANTE PARA GOOGLE
-    })
-    .then(r => {
-        if (!r.ok) throw new Error("Error en servidor");
-        return r.json();
-    })
-    .then(data => {
-        db = data.inventario || {};
-        
-        // Carga de visuales (logo/banner)
-        if(data.visuales) {
-            if(data.visuales.logo) {
-                const l1 = document.getElementById('app-logo');
-                const l2 = document.getElementById('login-logo');
-                l1.src = l2.src = data.visuales.logo;
-                l1.classList.remove('hidden'); l2.classList.remove('hidden');
-            }
-            if(data.visuales.banner) {
-                const b = document.getElementById('app-banner');
-                b.src = data.visuales.banner; b.style.display = 'block';
-            }
+        function setTipo(t) {
+            tipoActual = t;
+            document.getElementById('btn-normal').className = t === 'Normal' ? "flex-1 py-2 rounded-lg font-bold text-xs bg-orange text-white" : "flex-1 py-2 rounded-lg font-bold text-xs text-slate-500";
+            document.getElementById('btn-perso').className = t === 'Personalizado' ? "flex-1 py-2 rounded-lg font-bold text-xs bg-orange text-white" : "flex-1 py-2 rounded-lg font-bold text-xs text-slate-500";
         }
 
-        // Llenar modelos
-        const sel = document.getElementById('sel-modelo');
-        sel.innerHTML = '<option value="">-- Selecciona Calzado --</option>';
-        Object.keys(db).forEach(m => sel.innerHTML += `<option value="${m}">${m}</option>`);
+        function init() {
+            const user = document.getElementById('user').value;
+            if(!user || !scriptURL) return alert("Completa los datos");
+            fetch(scriptURL).then(r => r.json()).then(data => {
+                db = data.inventario;
+                if(data.visuales.logo) { document.getElementById('app-logo').src = document.getElementById('login-logo').src = data.visuales.logo; document.getElementById('app-logo').classList.remove('hidden'); document.getElementById('login-logo').classList.remove('hidden'); }
+                if(data.visuales.banner) { document.getElementById('app-banner').src = data.visuales.banner; document.getElementById('app-banner').style.display = 'block'; }
+                const sel = document.getElementById('sel-modelo');
+                sel.innerHTML = '<option value="">-- Selecciona Calzado --</option>';
+                Object.keys(db).forEach(m => sel.innerHTML += `<option value="${m}">${m}</option>`);
+                document.getElementById('p-login').classList.add('hidden');
+                document.getElementById('p-catalogo').classList.remove('hidden');
+            }).catch(() => alert("Error de conexión"));
+        }
 
-        document.getElementById('res-vendedor').innerText = user;
-        document.getElementById('p-login').classList.add('hidden');
-        document.getElementById('p-catalogo').classList.remove('hidden');
-    })
-    .catch(err => {
-        console.error("Error detallado:", err);
-        alert("ERROR DE CONEXIÓN: Verifica que hayas publicado el script como 'Aplicación Web' y que el acceso sea para 'Cualquier persona' (Anyone).");
-    });
-}
         function loadOptions() {
             const mod = document.getElementById('sel-modelo').value;
             const area = document.getElementById('options-area');
             if(!mod) return area.classList.add('hidden');
-
-            const info = db[mod];
-            document.getElementById('sel-talla').innerHTML = info.tallas.map(t => `<option>${t}</option>`).join('');
-            document.getElementById('sel-color').innerHTML = info.colores.map(c => `<option>${c}</option>`).join('');
+            document.getElementById('sel-talla').innerHTML = db[mod].tallas.map(t => `<option>${t}</option>`).join('');
+            document.getElementById('sel-color').innerHTML = db[mod].colores.map(c => `<option>${c}</option>`).join('');
             area.classList.remove('hidden');
         }
 
         function addToCart() {
-            const m = document.getElementById('sel-modelo').value;
-            const t = document.getElementById('sel-talla').value;
-            const c = document.getElementById('sel-color').value;
-            const n = document.getElementById('sel-cant').value;
-
-            cart.push({m, t, c, n});
+            cart.push({
+                m: document.getElementById('sel-modelo').value,
+                t: document.getElementById('sel-talla').value,
+                c: document.getElementById('sel-color').value,
+                n: document.getElementById('sel-cant').value,
+                tipo: tipoActual
+            });
             document.getElementById('badge').innerText = cart.length;
-            
             document.getElementById('sel-modelo').value = "";
             document.getElementById('options-area').classList.add('hidden');
-            alert("Añadido con éxito");
+            setTipo('Normal');
+            alert("Añadido");
         }
 
         function verCarrito() {
-            if(cart.length === 0) return alert("Tu carrito está vacío");
+            if(cart.length === 0) return alert("Vacío");
             document.getElementById('p-catalogo').classList.add('hidden');
             document.getElementById('p-carrito').classList.remove('hidden');
-            
             document.getElementById('cart-list').innerHTML = cart.map((i, idx) => `
-                <div class="flex justify-between items-center bg-slate-900/50 p-4 rounded-2xl border border-slate-800">
+                <div class="bg-slate-900/50 p-4 rounded-2xl border border-slate-800 flex justify-between items-center">
                     <div>
-                        <p class="font-bold text-white">${i.m}</p>
-                        <p class="text-[11px] text-slate-500 uppercase tracking-tighter">T:${i.t} | C:${i.c} | Cant: ${i.n}</p>
+                        <p class="font-bold text-white">${i.m} <span class="text-[9px] text-orange ml-2">[${i.tipo}]</span></p>
+                        <p class="text-[11px] text-slate-500">T:${i.t} | C:${i.c} | Cant:${i.n}</p>
                     </div>
-                    <button onclick="remove(${idx})" class="text-red-400 font-bold p-2">✕</button>
-                </div>
-            `).join('');
+                    <button onclick="remove(${idx})" class="text-red-400 font-bold">✕</button>
+                </div>`).join('');
         }
 
-        function remove(idx) {
-            cart.splice(idx, 1);
-            document.getElementById('badge').innerText = cart.length;
-            if(cart.length === 0) back(); else verCarrito();
-        }
-
-        function back() {
-            document.getElementById('p-carrito').classList.add('hidden');
-            document.getElementById('p-catalogo').classList.remove('hidden');
-        }
-
-        function config() {
-            const pass = prompt("Código de Configuración:");
-            if(pass === "1234") {
-                const u = prompt("URL de Google Script:", scriptURL);
-                if(u) {
-                    localStorage.setItem('panchito_url', u.trim());
-                    location.reload();
-                }
-            }
-        }
+        function remove(idx) { cart.splice(idx, 1); document.getElementById('badge').innerText = cart.length; if(cart.length === 0) back(); else verCarrito(); }
+        function back() { document.getElementById('p-carrito').classList.add('hidden'); document.getElementById('p-catalogo').classList.remove('hidden'); }
+        function config() { const p = prompt("Clave:"); if(p === "1234") { const u = prompt("URL Script:", scriptURL); if(u) { localStorage.setItem('panchito_url', u.trim()); location.reload(); } } }
 
         async function sendOrder() {
             const v = document.getElementById('user').value;
-            try {
-                await fetch(scriptURL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    body: JSON.stringify({vendedor: v, carrito: cart})
-                });
-                alert("PEDIDO ENVIADO CON ÉXITO");
-                location.reload();
-            } catch(e) { alert("Error al enviar el pedido."); }
+            await fetch(scriptURL, { method: "POST", mode: "no-cors", body: JSON.stringify({vendedor: v, carrito: cart}) });
+            alert("PEDIDO ENVIADO");
+            location.reload();
         }
     </script>
 </body>
