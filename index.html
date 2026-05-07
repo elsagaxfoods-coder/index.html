@@ -162,19 +162,33 @@
         function config() { const p = prompt("Clave:"); if(p === "1234") { const u = prompt("URL Script:", scriptURL); if(u) { localStorage.setItem('panchito_url', u.trim()); location.reload(); } } }
 
         async function sendOrder() {
-            const btn = document.getElementById('btn-send');
-            btn.innerText = "ENVIANDO..."; btn.disabled = true;
-            try {
-                await fetch(scriptURL, { 
-                    method: 'POST', 
-                    mode: 'no-cors', 
-                    headers: { 'Content-Type': 'text/plain' }, 
-                    body: JSON.stringify({ vendedor: document.getElementById('user').value, carrito: cart }) 
-                });
-                alert("🚀 ¡PEDIDO ENVIADO!");
-                cart = []; location.reload();
-            } catch(e) { alert("Error"); btn.innerText = "ENVIAR A SHEETS"; btn.disabled = false; }
-        }
-    </script>
-</body>
-</html>
+    if (cart.length === 0) return;
+    const btn = document.getElementById('btn-send');
+    const v = document.getElementById('user').value;
+
+    btn.innerText = "ENVIANDO...";
+    btn.disabled = true;
+
+    try {
+        // Usamos la técnica de texto plano para que el celular no bloquee el envío
+        await fetch(scriptURL, {
+            method: 'POST',
+            mode: 'no-cors', 
+            cache: 'no-cache',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({ vendedor: v, carrito: cart })
+        });
+
+        // En móviles, el alert debe ir después de un pequeño retraso
+        setTimeout(() => {
+            alert("🚀 PEDIDO ENVIADO CON ÉXITO\nRevisa tu hoja de cálculo.");
+            cart = [];
+            location.reload();
+        }, 500);
+
+    } catch (e) {
+        alert("Error de conexión. Intenta de nuevo.");
+        btn.innerText = "ENVIAR A SHEETS";
+        btn.disabled = false;
+    }
+}
