@@ -20,7 +20,7 @@
         <!-- PANTALLA 1: LOGIN -->
         <div id="p-login" class="bg-white p-6 rounded-b-xl shadow border-t">
             <div id="img-container" class="text-center mb-4">
-                <img id="logo-img" class="w-24 h-24 mx-auto rounded-full hidden border">
+                <img id="logo-img" class="w-24 h-24 mx-auto rounded-full hidden border" alt="Logo">
             </div>
             <input type="text" id="vendedor" placeholder="Tu nombre" class="w-full p-3 border rounded mb-4 outline-none focus:ring-2 focus:ring-blue-500">
             <button onclick="entrar()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold">ENTRAR AL CATÁLOGO</button>
@@ -32,7 +32,7 @@
                 <span id="nom-vendedor" class="font-bold"></span>
                 <button onclick="verCarrito()" class="bg-yellow-500 text-black px-3 py-1 rounded-full text-sm font-bold">🛒 <span id="cont">0</span></button>
             </div>
-            <img id="banner-img" class="w-full h-32 object-cover rounded-lg mb-4 hidden shadow">
+            <img id="banner-img" class="w-full h-32 object-cover rounded-lg mb-4 hidden shadow" alt="Banner">
             <div id="lista-prods" class="space-y-4"></div>
         </div>
 
@@ -47,12 +47,10 @@
     </div>
 
     <script>
-        // --- LÓGICA DE DATOS ---
         let urlScript = localStorage.getItem('panchito_url') || "";
         let inventario = {};
         let carrito = [];
 
-        // --- NAVEGACIÓN ---
         function entrar() {
             const v = document.getElementById('vendedor').value;
             if(!v) return alert("Escribe tu nombre");
@@ -62,15 +60,26 @@
                 .then(r => r.json())
                 .then(data => {
                     inventario = data.inventario;
-                    if(data.visuales.logo) { document.getElementById('logo-img').src = data.visuales.logo; document.getElementById('logo-img').classList.remove('hidden'); }
-                    if(data.visuales.banner) { document.getElementById('banner-img').src = data.visuales.banner; document.getElementById('banner-img').classList.remove('hidden'); }
+                    if(data.visuales && data.visuales.logo) { 
+                        const img = document.getElementById('logo-img');
+                        img.src = data.visuales.logo; 
+                        img.classList.remove('hidden'); 
+                    }
+                    if(data.visuales && data.visuales.banner) { 
+                        const ban = document.getElementById('banner-img');
+                        ban.src = data.visuales.banner; 
+                        ban.classList.remove('hidden'); 
+                    }
                     
                     document.getElementById('nom-vendedor').innerText = v;
                     renderProds();
                     document.getElementById('p-login').classList.add('hidden');
                     document.getElementById('p-catalogo').classList.remove('hidden');
                 })
-                .catch(e => alert("Error al conectar con Google. Verifica la URL."));
+                .catch(e => {
+                    console.error(e);
+                    alert("Error al conectar con Google. Verifica la URL y que el script esté publicado como 'Cualquier persona'.");
+                });
         }
 
         function menuConfig() {
@@ -84,11 +93,10 @@
             }
         }
 
-        // --- PRODUCTOS ---
         function renderProds() {
             const div = document.getElementById('lista-prods');
             div.innerHTML = "";
-            for(let m in inventario) {
+            Object.keys(inventario).forEach(m => {
                 const p = inventario[m];
                 div.innerHTML += `
                     <div class="bg-white p-4 rounded-xl shadow border">
@@ -97,10 +105,10 @@
                             <select id="t-${m}" class="flex-1 p-2 border rounded">${p.tallas.map(t=>`<option>${t}</option>`).join('')}</select>
                             <select id="c-${m}" class="flex-1 p-2 border rounded">${p.colores.map(c=>`<option>${c}</option>`).join('')}</select>
                         </div>
-                        <input type="number" id="n-${m}" value="1" class="w-full p-2 border rounded mb-2">
+                        <input type="number" id="n-${m}" value="1" min="1" class="w-full p-2 border rounded mb-2">
                         <button onclick="add('${m}')" class="w-full bg-blue-500 text-white py-2 rounded font-bold">AGREGAR</button>
                     </div>`;
-            }
+            });
         }
 
         function add(m) {
@@ -112,13 +120,16 @@
             alert("Añadido!");
         }
 
-        // --- CARRITO ---
         function verCarrito() {
             if(carrito.length === 0) return alert("Carrito vacío");
             document.getElementById('p-catalogo').classList.add('hidden');
             document.getElementById('p-carrito').classList.remove('hidden');
             const d = document.getElementById('items-car');
-            d.innerHTML = carrito.map((i, idx) => `<div class="flex justify-between border-b py-2"><span>${i.m} (T:${i.t} C:${i.c}) x${i.n}</span><button onclick="borrar(${idx})" class="text-red-500">Eliminar</button></div>`).join('');
+            d.innerHTML = carrito.map((i, idx) => `
+                <div class="flex justify-between border-b py-2">
+                    <span>${i.m} (T:${i.t} C:${i.c}) x${i.n}</span>
+                    <button onclick="borrar(${idx})" class="text-red-500 font-bold">X</button>
+                </div>`).join('');
         }
 
         function borrar(idx) {
@@ -135,10 +146,18 @@
         async function enviarPedido() {
             const v = document.getElementById('vendedor').value;
             try {
-                await fetch(urlScript, { method:"POST", mode:"no-cors", body: JSON.stringify({vendedor: v, carrito: carrito}) });
+                await fetch(urlScript, { 
+                    method: "POST", 
+                    mode: "no-cors", 
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({vendedor: v, carrito: carrito}) 
+                });
                 alert("PEDIDO ENVIADO CON ÉXITO");
+                carrito = [];
                 location.reload();
-            } catch(e) { alert("Error al enviar"); }
+            } catch(e) { 
+                alert("Error al enviar"); 
+            }
         }
     </script>
 </body>
