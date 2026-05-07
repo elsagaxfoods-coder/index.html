@@ -3,192 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Panchito Shoes - Ventas</title>
+    <title>Panchito Shoes</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .logo-img { width: 48px; height: 48px; object-fit: cover; border-radius: 50%; border: 2px solid #f97316; }
-        .banner-img { width: 100%; height: 140px; object-fit: cover; border-radius: 16px; display: none; border: 1px solid #334155; }
+        .banner-img { width: 100%; height: 140px; object-fit: cover; border-radius: 16px; display: none; }
         .bg-dark-app { background-color: #0f172a; }
         .card-dark { background-color: #1e293b; border: 1px solid #334155; }
-        .btn-orange { background-color: #f97316; }
-        .btn-orange:active { background-color: #ea580c; transform: scale(0.98); }
-        .text-orange { color: #f97316; }
-        input, select { font-size: 16px !important; } /* Evita zoom en iOS */
+        .btn-orange { background-color: #f97316; color: white; }
+        input, select { font-size: 16px !important; }
     </style>
 </head>
-<body class="bg-dark-app text-slate-100 font-sans">
+<body class="bg-dark-app text-slate-100">
 
-    <!-- BARRA SUPERIOR -->
-    <header class="bg-[#1e293b] shadow-xl sticky top-0 z-50 p-4 border-b border-slate-700">
+    <header class="bg-[#1e293b] p-4 border-b border-slate-700 sticky top-0 z-50">
         <div class="max-w-md mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <img id="app-logo" src="" class="logo-img hidden">
-                <h1 class="font-black text-lg tracking-tighter uppercase">Panchito<span class="text-orange">Shoes</span></h1>
-            </div>
-            <div class="flex items-center gap-3">
-                <button onclick="verCarrito()" class="relative p-2 bg-slate-800 rounded-full border border-slate-600">
-                    <span class="text-xl">🛒</span>
-                    <span id="badge" class="absolute -top-1 -right-1 btn-orange text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-[#1e293b]">0</span>
+            <h1 class="font-black text-lg uppercase">Panchito<span class="text-orange-500">Shoes</span></h1>
+            <div class="flex gap-3">
+                <button onclick="verCarrito()" class="relative p-2 bg-slate-800 rounded-full">
+                    🛒 <span id="badge" class="absolute -top-1 -right-1 bg-orange-500 text-[10px] rounded-full h-5 w-5 flex items-center justify-center">0</span>
                 </button>
-                <button onclick="config()" class="text-slate-500 text-xl">⚙️</button>
+                <button onclick="config()" class="text-slate-500">⚙️</button>
             </div>
         </div>
     </header>
 
     <main class="max-w-md mx-auto p-4">
-
-        <!-- LOGIN -->
+        <!-- PANTALLA LOGIN -->
         <section id="p-login" class="mt-10">
-            <div class="card-dark rounded-3xl p-8 text-center shadow-2xl">
-                <img id="login-logo" src="" class="w-24 h-24 mx-auto rounded-full mb-6 hidden border-2 border-orange">
-                <h2 class="text-xl font-bold mb-6">Panel de Vendedores</h2>
-                <input type="text" id="user" placeholder="Tu Nombre" class="w-full bg-slate-900 border-2 border-slate-700 p-4 rounded-2xl mb-6 outline-none focus:border-orange text-white text-center">
-                <button onclick="init()" id="btn-init" class="w-full btn-orange py-4 rounded-2xl font-black uppercase tracking-widest shadow-lg text-white">ENTRAR</button>
+            <div class="card-dark rounded-3xl p-8 text-center">
+                <img id="login-logo" src="" class="w-20 h-20 mx-auto rounded-full mb-4 hidden border-2 border-orange-500">
+                <input type="text" id="user" placeholder="Nombre Vendedor" class="w-full bg-slate-900 border-2 border-slate-700 p-4 rounded-xl mb-4 text-white text-center">
+                <button onclick="init()" id="btn-init" class="w-full btn-orange py-4 rounded-xl font-bold uppercase">INGRESAR</button>
             </div>
         </section>
 
-        <!-- CATALOGO -->
+        <!-- PANTALLA CATALOGO -->
         <section id="p-catalogo" class="hidden">
-            <img id="app-banner" src="" class="banner-img shadow-2xl mb-6">
-            
-            <div class="card-dark rounded-3xl p-6 shadow-lg mb-6">
-                <label class="block text-[10px] font-black text-orange uppercase mb-3 ml-1">Modelo de Calzado</label>
-                <select id="sel-modelo" onchange="loadOptions()" class="w-full p-4 bg-slate-900 border-2 border-slate-700 rounded-2xl outline-none focus:border-orange text-white mb-6">
-                    <option value="">-- Seleccionar --</option>
+            <img id="app-banner" src="" class="banner-img mb-4 rounded-xl">
+            <div class="card-dark rounded-3xl p-6">
+                <select id="sel-modelo" onchange="loadOptions()" class="w-full p-4 bg-slate-900 border-2 border-slate-700 rounded-xl text-white mb-4">
+                    <option value="">-- Seleccionar Modelo --</option>
                 </select>
-
-                <div id="options-area" class="hidden space-y-5 pt-6 border-t border-slate-700">
-                    
-                    <div>
-                        <span class="text-[10px] font-bold text-slate-400 uppercase ml-2 mb-2 block">Tipo de Pedido</span>
-                        <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-700">
-                            <button onclick="setTipo('Normal')" id="btn-normal" class="flex-1 py-2 rounded-lg font-bold text-xs bg-orange text-white">NORMAL</button>
-                            <button onclick="setTipo('Personalizado')" id="btn-perso" class="flex-1 py-2 rounded-lg font-bold text-xs text-slate-500">PERSONALIZADO</button>
-                        </div>
+                <div id="options-area" class="hidden space-y-4">
+                    <div class="flex bg-slate-900 p-1 rounded-lg border border-slate-700">
+                        <button onclick="setTipo('Normal')" id="btn-normal" class="flex-1 py-2 rounded-md bg-orange-500 text-xs font-bold">NORMAL</button>
+                        <button onclick="setTipo('Personalizado')" id="btn-perso" class="flex-1 py-2 text-xs text-slate-500 font-bold">PERSONALIZADO</button>
                     </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div><span class="text-[10px] text-slate-400 ml-2 uppercase">Talla</span>
-                        <select id="sel-talla" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white"></select></div>
-                        <div><span class="text-[10px] text-slate-400 ml-2 uppercase">Color</span>
-                        <select id="sel-color" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white"></select></div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <select id="sel-talla" class="p-3 bg-slate-900 border border-slate-700 rounded-lg text-white"></select>
+                        <select id="sel-color" class="p-3 bg-slate-900 border border-slate-700 rounded-lg text-white"></select>
                     </div>
-                    
-                    <div><span class="text-[10px] text-slate-400 ml-2 uppercase">Cantidad</span>
-                    <input type="number" id="sel-cant" value="1" min="1" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl font-bold text-orange text-center"></div>
-
-                    <button onclick="addToCart()" class="w-full btn-orange text-white py-4 rounded-2xl font-black uppercase tracking-wide">AGREGAR</button>
+                    <input type="number" id="sel-cant" value="1" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-lg text-center text-orange-500 font-bold">
+                    <button onclick="addToCart()" class="w-full btn-orange py-4 rounded-xl font-bold">AÑADIR</button>
                 </div>
             </div>
         </section>
 
-        <!-- CARRITO -->
+        <!-- PANTALLA CARRITO -->
         <section id="p-carrito" class="hidden">
-            <div class="card-dark rounded-3xl p-6 shadow-2xl flex flex-col min-h-[400px]">
-                <h2 class="text-lg font-black italic mb-4 border-b border-slate-700 pb-2">PEDIDO ACTUAL</h2>
-                <div id="cart-list" class="flex-grow space-y-3"></div>
-                <div class="mt-8 space-y-4">
-                    <button onclick="sendOrder()" id="btn-send" class="w-full bg-emerald-600 text-white py-4 rounded-2xl font-black text-lg uppercase shadow-lg">ENVIAR A SHEETS</button>
-                    <button onclick="back()" class="w-full text-slate-500 font-bold py-2 text-sm">← VOLVER</button>
-                </div>
+            <div class="card-dark rounded-3xl p-6">
+                <h2 class="font-bold mb-4 border-b border-slate-700 pb-2 uppercase">Tu Pedido</h2>
+                <div id="cart-list" class="space-y-2 mb-6"></div>
+                <button onclick="sendOrder()" id="btn-send" class="w-full bg-emerald-600 py-4 rounded-xl font-bold text-white mb-2">ENVIAR PEDIDO</button>
+                <button onclick="back()" class="w-full text-slate-500 text-sm">← VOLVER</button>
             </div>
         </section>
     </main>
 
     <script>
         let scriptURL = localStorage.getItem('panchito_url') || "";
-        let db = {};
-        let cart = [];
-        let tipoActual = "Normal";
-
-        function setTipo(t) {
-            tipoActual = t;
-            document.getElementById('btn-normal').className = t === 'Normal' ? "flex-1 py-2 rounded-lg font-bold text-xs bg-orange text-white" : "flex-1 py-2 rounded-lg font-bold text-xs text-slate-500";
-            document.getElementById('btn-perso').className = t === 'Personalizado' ? "flex-1 py-2 rounded-lg font-bold text-xs bg-orange text-white" : "flex-1 py-2 rounded-lg font-bold text-xs text-slate-500";
-        }
+        let db = {}; let cart = []; let tipoActual = "Normal";
 
         async function init() {
-            const user = document.getElementById('user').value.trim();
-            if(!user || !scriptURL) return alert("Ingresa tu nombre y configura la URL en el engranaje ⚙️");
-            
-            document.getElementById('btn-init').innerText = "CONECTANDO...";
+            const u = document.getElementById('user').value.trim();
+            if(!u || !scriptURL) return alert("Faltan datos o URL de configuración");
+            document.getElementById('btn-init').innerText = "CARGANDO...";
             
             try {
-                const r = await fetch(scriptURL);
-                const data = await r.json();
+                const response = await fetch(scriptURL);
+                const data = await response.json();
                 db = data.inventario;
                 
-                if(data.visuales.logo) { document.getElementById('app-logo').src = document.getElementById('login-logo').src = data.visuales.logo; document.getElementById('app-logo').classList.remove('hidden'); document.getElementById('login-logo').classList.remove('hidden'); }
+                if(data.visuales.logo) { document.getElementById('login-logo').src = data.visuales.logo; document.getElementById('login-logo').classList.remove('hidden'); }
                 if(data.visuales.banner) { document.getElementById('app-banner').src = data.visuales.banner; document.getElementById('app-banner').style.display = 'block'; }
                 
                 const sel = document.getElementById('sel-modelo');
+                sel.innerHTML = '<option value="">-- Seleccionar Modelo --</option>';
                 Object.keys(db).forEach(m => sel.innerHTML += `<option value="${m}">${m}</option>`);
                 
                 document.getElementById('p-login').classList.add('hidden');
                 document.getElementById('p-catalogo').classList.remove('hidden');
-            } catch(e) { alert("Error de conexión. Revisa la URL del engranaje."); document.getElementById('btn-init').innerText = "ENTRAR"; }
+            } catch(e) {
+                alert("Error al conectar. Verifica la URL en el engranaje.");
+                document.getElementById('btn-init').innerText = "INGRESAR";
+            }
         }
 
         function loadOptions() {
-            const mod = document.getElementById('sel-modelo').value;
-            if(!mod) return document.getElementById('options-area').classList.add('hidden');
-            document.getElementById('sel-talla').innerHTML = db[mod].tallas.map(t => `<option>${t}</option>`).join('');
-            document.getElementById('sel-color').innerHTML = db[mod].colores.map(c => `<option>${c}</option>`).join('');
-            document.getElementById('options-area').classList.remove('hidden');
+            const m = document.getElementById('sel-modelo').value;
+            const area = document.getElementById('options-area');
+            if(!m) return area.classList.add('hidden');
+            document.getElementById('sel-talla').innerHTML = db[m].tallas.map(t => `<option>${t}</option>`).join('');
+            document.getElementById('sel-color').innerHTML = db[m].colores.map(c => `<option>${c}</option>`).join('');
+            area.classList.remove('hidden');
+        }
+
+        function setTipo(t) {
+            tipoActual = t;
+            document.getElementById('btn-normal').className = t==='Normal' ? "flex-1 py-2 rounded-md bg-orange-500 text-xs font-bold" : "flex-1 py-2 text-xs text-slate-500 font-bold";
+            document.getElementById('btn-perso').className = t==='Personalizado' ? "flex-1 py-2 rounded-md bg-orange-500 text-xs font-bold" : "flex-1 py-2 text-xs text-slate-500 font-bold";
         }
 
         function addToCart() {
             cart.push({ m: document.getElementById('sel-modelo').value, t: document.getElementById('sel-talla').value, c: document.getElementById('sel-color').value, n: document.getElementById('sel-cant').value, tipo: tipoActual });
             document.getElementById('badge').innerText = cart.length;
+            alert("Agregado");
             document.getElementById('sel-modelo').value = "";
             document.getElementById('options-area').classList.add('hidden');
-            alert("Añadido");
         }
 
         function verCarrito() {
-            if(cart.length === 0) return alert("Vacío");
+            if(cart.length === 0) return alert("Carrito vacío");
             document.getElementById('p-catalogo').classList.add('hidden');
             document.getElementById('p-carrito').classList.remove('hidden');
             document.getElementById('cart-list').innerHTML = cart.map((i, idx) => `
-                <div class="bg-slate-900/50 p-4 rounded-2xl border border-slate-800 flex justify-between items-center">
-                    <div><p class="font-bold text-white text-xs uppercase">${i.m} <span class="text-orange">[${i.tipo}]</span></p>
-                    <p class="text-[10px] text-slate-400">T:${i.t} | C:${i.c} | Cant:${i.n}</p></div>
-                    <button onclick="remove(${idx})" class="text-red-400 p-2 font-bold">✕</button>
+                <div class="bg-slate-900 p-3 rounded-lg flex justify-between items-center border border-slate-800">
+                    <div><p class="text-xs font-bold">${i.m} <span class="text-orange-500">[${i.tipo}]</span></p>
+                    <p class="text-[10px] text-slate-400">T:${i.t} C:${i.c} Cant:${i.n}</p></div>
+                    <button onclick="remove(${idx})" class="text-red-500 font-bold px-2">✕</button>
                 </div>`).join('');
         }
 
-        function remove(idx) { cart.splice(idx, 1); document.getElementById('badge').innerText = cart.length; if(cart.length === 0) back(); else verCarrito(); }
+        function remove(idx) { cart.splice(idx,1); document.getElementById('badge').innerText = cart.length; if(cart.length===0) back(); else verCarrito(); }
         function back() { document.getElementById('p-carrito').classList.add('hidden'); document.getElementById('p-catalogo').classList.remove('hidden'); }
-        function config() { const p = prompt("Clave:"); if(p === "1234") { const u = prompt("URL Script:", scriptURL); if(u) { localStorage.setItem('panchito_url', u.trim()); location.reload(); } } }
+        function config() { const p = prompt("Clave:"); if(p==="1234") { const u = prompt("URL Script:", scriptURL); if(u) { localStorage.setItem('panchito_url', u.trim()); location.reload(); } } }
 
         async function sendOrder() {
-    if (cart.length === 0) return;
-    const btn = document.getElementById('btn-send');
-    const v = document.getElementById('user').value;
-
-    btn.innerText = "ENVIANDO...";
-    btn.disabled = true;
-
-    try {
-        // Usamos la técnica de texto plano para que el celular no bloquee el envío
-        await fetch(scriptURL, {
-            method: 'POST',
-            mode: 'no-cors', 
-            cache: 'no-cache',
-            headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify({ vendedor: v, carrito: cart })
-        });
-
-        // En móviles, el alert debe ir después de un pequeño retraso
-        setTimeout(() => {
-            alert("🚀 PEDIDO ENVIADO CON ÉXITO\nRevisa tu hoja de cálculo.");
-            cart = [];
-            location.reload();
-        }, 500);
-
-    } catch (e) {
-        alert("Error de conexión. Intenta de nuevo.");
-        btn.innerText = "ENVIAR A SHEETS";
-        btn.disabled = false;
-    }
-}
+            const btn = document.getElementById('btn-send');
+            btn.innerText = "ENVIANDO..."; btn.disabled = true;
+            try {
+                await fetch(scriptURL, { 
+                    method: 'POST', 
+                    mode: 'no-cors', 
+                    headers: { 'Content-Type': 'text/plain' }, 
+                    body: JSON.stringify({ vendedor: document.getElementById('user').value, carrito: cart }) 
+                });
+                alert("✅ ¡PEDIDO ENVIADO!");
+                cart = []; location.reload();
+            } catch(e) { alert("Error de red"); btn.innerText = "ENVIAR PEDIDO"; btn.disabled = false; }
+        }
+    </script>
+</body>
+</html>
