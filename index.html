@@ -123,51 +123,49 @@
     if(!user) return alert("Por favor, ingresa tu nombre.");
     if(!scriptURL) return alert("Falta configurar la URL (⚙️)");
 
-    // Añadimos un log para ver qué URL estamos llamando
-    console.log("Llamando a:", scriptURL);
+    // Limpiamos la URL por si tiene espacios o errores de copiado
+    const finalURL = scriptURL.trim();
 
-    fetch(scriptURL)
-        .then(r => {
-            if (!r.ok) throw new Error("Error en respuesta de red");
-            return r.json();
-        })
-        .then(data => {
-            console.log("Datos recibidos:", data); // Esto ayuda a debugear
-            db = data.inventario || {};
-            
-            // Cargar Imágenes con validación
-            if(data.visuales) {
-                if(data.visuales.logo) {
-                    const l1 = document.getElementById('app-logo');
-                    const l2 = document.getElementById('login-logo');
-                    l1.src = l2.src = data.visuales.logo;
-                    l1.classList.remove('hidden'); l2.classList.remove('hidden');
-                }
-                if(data.visuales.banner) {
-                    const b = document.getElementById('app-banner');
-                    b.src = data.visuales.banner; b.style.display = 'block';
-                }
+    fetch(finalURL, {
+        method: "GET",
+        mode: "cors", // Cambiamos a cors explícito
+        redirect: "follow" // ESTO ES LO MÁS IMPORTANTE PARA GOOGLE
+    })
+    .then(r => {
+        if (!r.ok) throw new Error("Error en servidor");
+        return r.json();
+    })
+    .then(data => {
+        db = data.inventario || {};
+        
+        // Carga de visuales (logo/banner)
+        if(data.visuales) {
+            if(data.visuales.logo) {
+                const l1 = document.getElementById('app-logo');
+                const l2 = document.getElementById('login-logo');
+                l1.src = l2.src = data.visuales.logo;
+                l1.classList.remove('hidden'); l2.classList.remove('hidden');
             }
+            if(data.visuales.banner) {
+                const b = document.getElementById('app-banner');
+                b.src = data.visuales.banner; b.style.display = 'block';
+            }
+        }
 
-            // Cargar Modelos
-            const sel = document.getElementById('sel-modelo');
-            sel.innerHTML = '<option value="">-- Selecciona Calzado --</option>';
-            
-            if (Object.keys(db).length === 0) {
-                alert("El inventario está vacío. Revisa tu hoja de Google Sheets.");
-            } else {
-                Object.keys(db).forEach(m => sel.innerHTML += `<option value="${m}">${m}</option>`);
-                document.getElementById('res-vendedor').innerText = user;
-                document.getElementById('p-login').classList.add('hidden');
-                document.getElementById('p-catalogo').classList.remove('hidden');
-            }
-        })
-        .catch(err => {
-            console.error("Error detallado:", err);
-            alert("Error de conexión: Asegúrate de que el script esté publicado como 'Cualquier persona' y que la URL sea la correcta.");
-        });
+        // Llenar modelos
+        const sel = document.getElementById('sel-modelo');
+        sel.innerHTML = '<option value="">-- Selecciona Calzado --</option>';
+        Object.keys(db).forEach(m => sel.innerHTML += `<option value="${m}">${m}</option>`);
+
+        document.getElementById('res-vendedor').innerText = user;
+        document.getElementById('p-login').classList.add('hidden');
+        document.getElementById('p-catalogo').classList.remove('hidden');
+    })
+    .catch(err => {
+        console.error("Error detallado:", err);
+        alert("ERROR DE CONEXIÓN: Verifica que hayas publicado el script como 'Aplicación Web' y que el acceso sea para 'Cualquier persona' (Anyone).");
+    });
 }
-
         function loadOptions() {
             const mod = document.getElementById('sel-modelo').value;
             const area = document.getElementById('options-area');
