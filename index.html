@@ -3,165 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Panchito Shoes</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .logo-img { width: 48px; height: 48px; object-fit: cover; border-radius: 50%; border: 2px solid #f97316; }
-        .banner-img { width: 100%; height: 140px; object-fit: cover; border-radius: 16px; display: none; }
-        .bg-dark-app { background-color: #0f172a; }
-        .card-dark { background-color: #1e293b; border: 1px solid #334155; }
-        .btn-orange { background-color: #f97316; color: white; }
-        input, select { font-size: 16px !important; }
-    </style>
+    <title>Panchito Shoes - Pedidos</title>
+    
+    <!-- CONFIGURACIÓN PWA (MODO APP) -->
     <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2196F3">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2196F3">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <style>
+        :root { --primary: #2196F3; --bg: #f0f2f5; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background-color: var(--bg); margin: 0; padding: 15px; display: flex; justify-content: center; }
+        .card { background: white; width: 100%; max-width: 450px; padding: 25px; border-radius: 24px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
+        h2 { text-align: center; color: #1a1a1a; margin-bottom: 25px; font-size: 24px; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: #444; }
+        input, select, textarea { width: 100%; padding: 14px; border: 1.5px solid #e0e0e0; border-radius: 12px; box-sizing: border-box; font-size: 16px; outline: none; transition: border-color 0.3s; background: #fafafa; }
+        input:focus, select:focus { border-color: var(--primary); background: #fff; }
+        button { width: 100%; background: var(--primary); color: white; border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3); transition: all 0.2s; }
+        button:active { transform: scale(0.97); background: #1976D2; }
+        button:disabled { background: #bdbdbd; box-shadow: none; }
+        .status-bar { display: none; text-align: center; padding: 14px; margin-top: 15px; border-radius: 12px; font-size: 14px; font-weight: bold; animation: fadeIn 0.3s; }
+        .success { display: block; background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
-<body class="bg-dark-app text-slate-100">
+<body>
 
-    <header class="bg-[#1e293b] p-4 border-b border-slate-700 sticky top-0 z-50">
-        <div class="max-w-md mx-auto flex justify-between items-center">
-            <h1 class="font-black text-lg uppercase">Panchito<span class="text-orange-500">Shoes</span></h1>
-            <div class="flex gap-3">
-                <button onclick="verCarrito()" class="relative p-2 bg-slate-800 rounded-full">
-                    🛒 <span id="badge" class="absolute -top-1 -right-1 bg-orange-500 text-[10px] rounded-full h-5 w-5 flex items-center justify-center">0</span>
-                </button>
-                <button onclick="config()" class="text-slate-500">⚙️</button>
-            </div>
+<div class="card">
+    <h2>👟 Panchito Shoes</h2>
+    
+    <div class="form-group">
+        <label>Vendedor</label>
+        <input type="text" id="vendedor" placeholder="Tu nombre o ID">
+    </div>
+
+    <div class="form-group">
+        <label>Tipo de Calzado</label>
+        <select id="tipo">
+            <option value="Sandalia">Sandalia</option>
+            <option value="Bota">Bota</option>
+            <option value="Zapato">Zapato</option>
+            <option value="Tenis">Tenis</option>
+            <option value="Otro">Otro</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Modelo / Referencia</label>
+        <input type="text" id="modelo" placeholder="Nombre del modelo">
+    </div>
+
+    <div style="display: flex; gap: 12px;">
+        <div class="form-group" style="flex: 1;">
+            <label>Talla</label>
+            <input type="number" id="talla" placeholder="26">
         </div>
-    </header>
+        <div class="form-group" style="flex: 1.5;">
+            <label>Color</label>
+            <input type="text" id="color" placeholder="Ej: Negro">
+        </div>
+    </div>
 
-    <main class="max-w-md mx-auto p-4">
-        <!-- PANTALLA LOGIN -->
-        <section id="p-login" class="mt-10">
-            <div class="card-dark rounded-3xl p-8 text-center">
-                <img id="login-logo" src="" class="w-20 h-20 mx-auto rounded-full mb-4 hidden border-2 border-orange-500">
-                <input type="text" id="user" placeholder="Nombre Vendedor" class="w-full bg-slate-900 border-2 border-slate-700 p-4 rounded-xl mb-4 text-white text-center">
-                <button onclick="init()" id="btn-init" class="w-full btn-orange py-4 rounded-xl font-bold uppercase">INGRESAR</button>
-            </div>
-        </section>
+    <div class="form-group">
+        <label>Notas Adicionales</label>
+        <textarea id="notas" rows="2" placeholder="Especificaciones del cliente..."></textarea>
+    </div>
 
-        <!-- PANTALLA CATALOGO -->
-        <section id="p-catalogo" class="hidden">
-            <img id="app-banner" src="" class="banner-img mb-4 rounded-xl">
-            <div class="card-dark rounded-3xl p-6">
-                <select id="sel-modelo" onchange="loadOptions()" class="w-full p-4 bg-slate-900 border-2 border-slate-700 rounded-xl text-white mb-4">
-                    <option value="">-- Seleccionar Modelo --</option>
-                </select>
-                <div id="options-area" class="hidden space-y-4">
-                    <div class="flex bg-slate-900 p-1 rounded-lg border border-slate-700">
-                        <button onclick="setTipo('Normal')" id="btn-normal" class="flex-1 py-2 rounded-md bg-orange-500 text-xs font-bold">NORMAL</button>
-                        <button onclick="setTipo('Personalizado')" id="btn-perso" class="flex-1 py-2 text-xs text-slate-500 font-bold">PERSONALIZADO</button>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <select id="sel-talla" class="p-3 bg-slate-900 border border-slate-700 rounded-lg text-white"></select>
-                        <select id="sel-color" class="p-3 bg-slate-900 border border-slate-700 rounded-lg text-white"></select>
-                    </div>
-                    <input type="number" id="sel-cant" value="1" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-lg text-center text-orange-500 font-bold">
-                    <button onclick="addToCart()" class="w-full btn-orange py-4 rounded-xl font-bold">AÑADIR</button>
-                </div>
-            </div>
-        </section>
+    <button id="btnEnviar" onclick="enviarPedido()">ENVIAR PEDIDO</button>
 
-        <!-- PANTALLA CARRITO -->
-        <section id="p-carrito" class="hidden">
-            <div class="card-dark rounded-3xl p-6">
-                <h2 class="font-bold mb-4 border-b border-slate-700 pb-2 uppercase">Tu Pedido</h2>
-                <div id="cart-list" class="space-y-2 mb-6"></div>
-                <button onclick="sendOrder()" id="btn-send" class="w-full bg-emerald-600 py-4 rounded-xl font-bold text-white mb-2">ENVIAR PEDIDO</button>
-                <button onclick="back()" class="w-full text-slate-500 text-sm">← VOLVER</button>
-            </div>
-        </section>
-    </main>
+    <div id="status" class="status-bar"></div>
+</div>
 
-    <script>
-        let scriptURL = localStorage.getItem('panchito_url') || "";
-        let db = {}; let cart = []; let tipoActual = "Normal";
+<script>
+    // URL DE TU SCRIPT DE GOOGLE
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwc2fCBRlPx15h2tjqSKXiTSag0B6NF6xihgyUCESy0BNfP0Z_1_d7CItubZd9f4PHL/exec";
 
-        async function init() {
-            const u = document.getElementById('user').value.trim();
-            if(!u || !scriptURL) return alert("Faltan datos o URL de configuración");
-            document.getElementById('btn-init').innerText = "CARGANDO...";
+    async function enviarPedido() {
+        const btn = document.getElementById('btnEnviar');
+        const status = document.getElementById('status');
+        
+        const payload = {
+            vendedor: document.getElementById('vendedor').value,
+            carrito: [{
+                tipo: document.getElementById('tipo').value,
+                m: document.getElementById('modelo').value,
+                t: document.getElementById('talla').value,
+                c: document.getElementById('color').value,
+                n: document.getElementById('notas').value
+            }]
+        };
+
+        if (!payload.vendedor || !payload.carrito[0].m || !payload.carrito[0].t) {
+            alert("Completa Vendedor, Modelo y Talla para continuar.");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "Procesando...";
+
+        try {
+            await fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            // Éxito visual
+            status.innerText = "¡Pedido enviado a la hoja! ✅";
+            status.className = "status-bar success";
             
-            try {
-                const response = await fetch(scriptURL);
-                const data = await response.json();
-                db = data.inventario;
-                
-                if(data.visuales.logo) { document.getElementById('login-logo').src = data.visuales.logo; document.getElementById('login-logo').classList.remove('hidden'); }
-                if(data.visuales.banner) { document.getElementById('app-banner').src = data.visuales.banner; document.getElementById('app-banner').style.display = 'block'; }
-                
-                const sel = document.getElementById('sel-modelo');
-                sel.innerHTML = '<option value="">-- Seleccionar Modelo --</option>';
-                Object.keys(db).forEach(m => sel.innerHTML += `<option value="${m}">${m}</option>`);
-                
-                document.getElementById('p-login').classList.add('hidden');
-                document.getElementById('p-catalogo').classList.remove('hidden');
-            } catch(e) {
-                alert("Error al conectar. Verifica la URL en el engranaje.");
-                document.getElementById('btn-init').innerText = "INGRESAR";
-            }
-        }
+            // Limpieza selectiva
+            document.getElementById('modelo').value = "";
+            document.getElementById('talla').value = "";
+            document.getElementById('color').value = "";
+            document.getElementById('notas').value = "";
 
-        function loadOptions() {
-            const m = document.getElementById('sel-modelo').value;
-            const area = document.getElementById('options-area');
-            if(!m) return area.classList.add('hidden');
-            document.getElementById('sel-talla').innerHTML = db[m].tallas.map(t => `<option>${t}</option>`).join('');
-            document.getElementById('sel-color').innerHTML = db[m].colores.map(c => `<option>${c}</option>`).join('');
-            area.classList.remove('hidden');
+        } catch (error) {
+            console.error(error);
+            alert("Error de conexión. Revisa tu internet.");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "ENVIAR PEDIDO";
+            setTimeout(() => { 
+                status.className = "status-bar"; 
+                status.innerText = ""; 
+            }, 4500);
         }
+    }
 
-        function setTipo(t) {
-            tipoActual = t;
-            document.getElementById('btn-normal').className = t==='Normal' ? "flex-1 py-2 rounded-md bg-orange-500 text-xs font-bold" : "flex-1 py-2 text-xs text-slate-500 font-bold";
-            document.getElementById('btn-perso').className = t==='Personalizado' ? "flex-1 py-2 rounded-md bg-orange-500 text-xs font-bold" : "flex-1 py-2 text-xs text-slate-500 font-bold";
-        }
+    // ACTIVADOR DE INSTALACIÓN (SERVICE WORKER)
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').then(reg => {
+                console.log('Sistema de App Activo');
+            });
+        });
+    }
+</script>
 
-        function addToCart() {
-            cart.push({ m: document.getElementById('sel-modelo').value, t: document.getElementById('sel-talla').value, c: document.getElementById('sel-color').value, n: document.getElementById('sel-cant').value, tipo: tipoActual });
-            document.getElementById('badge').innerText = cart.length;
-            alert("Agregado");
-            document.getElementById('sel-modelo').value = "";
-            document.getElementById('options-area').classList.add('hidden');
-        }
-
-        function verCarrito() {
-            if(cart.length === 0) return alert("Carrito vacío");
-            document.getElementById('p-catalogo').classList.add('hidden');
-            document.getElementById('p-carrito').classList.remove('hidden');
-            document.getElementById('cart-list').innerHTML = cart.map((i, idx) => `
-                <div class="bg-slate-900 p-3 rounded-lg flex justify-between items-center border border-slate-800">
-                    <div><p class="text-xs font-bold">${i.m} <span class="text-orange-500">[${i.tipo}]</span></p>
-                    <p class="text-[10px] text-slate-400">T:${i.t} C:${i.c} Cant:${i.n}</p></div>
-                    <button onclick="remove(${idx})" class="text-red-500 font-bold px-2">✕</button>
-                </div>`).join('');
-        }
-
-        function remove(idx) { cart.splice(idx,1); document.getElementById('badge').innerText = cart.length; if(cart.length===0) back(); else verCarrito(); }
-        function back() { document.getElementById('p-carrito').classList.add('hidden'); document.getElementById('p-catalogo').classList.remove('hidden'); }
-        function config() { const p = prompt("Clave:"); if(p==="1234") { const u = prompt("URL Script:", scriptURL); if(u) { localStorage.setItem('panchito_url', u.trim()); location.reload(); } } }
-
-        async function sendOrder() {
-            const btn = document.getElementById('btn-send');
-            btn.innerText = "ENVIANDO..."; btn.disabled = true;
-            try {
-                await fetch(scriptURL, { 
-                    method: 'POST', 
-                    mode: 'no-cors', 
-                    headers: { 'Content-Type': 'text/plain' }, 
-                    body: JSON.stringify({ vendedor: document.getElementById('user').value, carrito: cart }) 
-                });
-                alert("✅ ¡PEDIDO ENVIADO!");
-                cart = []; location.reload();
-            } catch(e) { alert("Error de red"); btn.innerText = "ENVIAR PEDIDO"; btn.disabled = false; }
-        }
-    </script>
-    <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js');
-      }
-    </script>
-    ```
 </body>
 </html>
