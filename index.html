@@ -157,5 +157,11 @@
             } catch(e) { alert("Error de red"); btn.innerText = "ENVIAR PEDIDO"; btn.disabled = false; }
         }
     </script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
+      }
+    </script>
+    ```
 </body>
 </html>
