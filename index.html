@@ -20,6 +20,8 @@
         .card-dark { background-color: #1e293b; border: 1px solid #334155; }
         .btn-orange { background-color: #f97316; color: white; }
         input, select { font-size: 16px !important; }
+        /* Estilo para la imagen del modelo */
+        #modelo-img { width: 100%; height: 200px; object-fit: contain; background-color: #000; border-radius: 12px; }
     </style>
 </head>
 <body class="bg-dark-app text-slate-100">
@@ -49,10 +51,17 @@
         <!-- PANTALLA CATALOGO -->
         <section id="p-catalogo" class="hidden">
             <img id="app-banner" src="" class="banner-img mb-4 rounded-xl">
+            
+            <!-- CONTENEDOR DE IMAGEN DINÁMICA -->
+            <div id="img-container" class="hidden mb-4">
+                <img id="modelo-img" src="" alt="Vista del modelo">
+            </div>
+
             <div class="card-dark rounded-3xl p-6">
                 <select id="sel-modelo" onchange="loadOptions()" class="w-full p-4 bg-slate-900 border-2 border-slate-700 rounded-xl text-white mb-4">
                     <option value="">-- Seleccionar Modelo --</option>
                 </select>
+                
                 <div id="options-area" class="hidden space-y-4">
                     <div class="flex bg-slate-900 p-1 rounded-lg border border-slate-700">
                         <button onclick="setTipo('Normal')" id="btn-normal" class="flex-1 py-2 rounded-md bg-orange-500 text-xs font-bold">NORMAL</button>
@@ -63,7 +72,7 @@
                         <select id="sel-color" class="p-3 bg-slate-900 border border-slate-700 rounded-lg text-white"></select>
                     </div>
                     <input type="number" id="sel-cant" value="1" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-lg text-center text-orange-500 font-bold">
-                    <button onclick="addToCart()" class="w-full btn-orange py-4 rounded-xl font-bold">AÑADIR</button>
+                    <button onclick="addToCart()" class="w-full btn-orange py-4 rounded-xl font-bold">AÑADIR AL CARRITO</button>
                 </div>
             </div>
         </section>
@@ -80,15 +89,6 @@
     </main>
 
     <script>
-        // ACTIVACIÓN DE MODO APP (SERVICE WORKER)
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').then(reg => {
-                    console.log('App lista');
-                });
-            });
-        }
-
         let scriptURL = localStorage.getItem('panchito_url') || "";
         let db = {}; let cart = []; let tipoActual = "Normal";
 
@@ -102,8 +102,14 @@
                 const data = await response.json();
                 db = data.inventario;
                 
-                if(data.visuales.logo) { document.getElementById('login-logo').src = data.visuales.logo; document.getElementById('login-logo').classList.remove('hidden'); }
-                if(data.visuales.banner) { document.getElementById('app-banner').src = data.visuales.banner; document.getElementById('app-banner').style.display = 'block'; }
+                if(data.visuales.logo) { 
+                    document.getElementById('login-logo').src = data.visuales.logo; 
+                    document.getElementById('login-logo').classList.remove('hidden'); 
+                }
+                if(data.visuales.banner) { 
+                    document.getElementById('app-banner').src = data.visuales.banner; 
+                    document.getElementById('app-banner').style.display = 'block'; 
+                }
                 
                 const sel = document.getElementById('sel-modelo');
                 sel.innerHTML = '<option value="">-- Seleccionar Modelo --</option>';
@@ -120,7 +126,23 @@
         function loadOptions() {
             const m = document.getElementById('sel-modelo').value;
             const area = document.getElementById('options-area');
-            if(!m) return area.classList.add('hidden');
+            const imgContainer = document.getElementById('img-container');
+            const imgEl = document.getElementById('modelo-img');
+
+            if(!m) {
+                area.classList.add('hidden');
+                imgContainer.classList.add('hidden');
+                return;
+            }
+
+            // Cargar imagen
+            if(db[m].foto) {
+                imgEl.src = db[m].foto;
+                imgContainer.classList.remove('hidden');
+            } else {
+                imgContainer.classList.add('hidden');
+            }
+
             document.getElementById('sel-talla').innerHTML = db[m].tallas.map(t => `<option>${t}</option>`).join('');
             document.getElementById('sel-color').innerHTML = db[m].colores.map(c => `<option>${c}</option>`).join('');
             area.classList.remove('hidden');
@@ -133,11 +155,22 @@
         }
 
         function addToCart() {
-            cart.push({ m: document.getElementById('sel-modelo').value, t: document.getElementById('sel-talla').value, c: document.getElementById('sel-color').value, n: document.getElementById('sel-cant').value, tipo: tipoActual });
+            const m = document.getElementById('sel-modelo').value;
+            cart.push({ 
+                m: m, 
+                t: document.getElementById('sel-talla').value, 
+                c: document.getElementById('sel-color').value, 
+                n: document.getElementById('sel-cant').value, 
+                tipo: tipoActual,
+                img: db[m].foto || "" 
+            });
             document.getElementById('badge').innerText = cart.length;
-            alert("Agregado");
+            alert("Agregado al carrito");
+            
+            // Reset selectors
             document.getElementById('sel-modelo').value = "";
             document.getElementById('options-area').classList.add('hidden');
+            document.getElementById('img-container').classList.add('hidden');
         }
 
         function verCarrito() {
@@ -145,16 +178,34 @@
             document.getElementById('p-catalogo').classList.add('hidden');
             document.getElementById('p-carrito').classList.remove('hidden');
             document.getElementById('cart-list').innerHTML = cart.map((i, idx) => `
-                <div class="bg-slate-900 p-3 rounded-lg flex justify-between items-center border border-slate-800">
-                    <div><p class="text-xs font-bold">${i.m} <span class="text-orange-500">[${i.tipo}]</span></p>
-                    <p class="text-[10px] text-slate-400">T:${i.t} C:${i.c} Cant:${i.n}</p></div>
+                <div class="bg-slate-900 p-3 rounded-lg flex items-center gap-3 border border-slate-800">
+                    <img src="${i.img || 'https://via.placeholder.com/50'}" class="w-12 h-12 rounded object-cover">
+                    <div class="flex-1">
+                        <p class="text-xs font-bold">${i.m} <span class="text-orange-500">[${i.tipo}]</span></p>
+                        <p class="text-[10px] text-slate-400">T:${i.t} C:${i.c} Cant:${i.n}</p>
+                    </div>
                     <button onclick="remove(${idx})" class="text-red-500 font-bold px-2">✕</button>
                 </div>`).join('');
         }
 
-        function remove(idx) { cart.splice(idx,1); document.getElementById('badge').innerText = cart.length; if(cart.length===0) back(); else verCarrito(); }
-        function back() { document.getElementById('p-carrito').classList.add('hidden'); document.getElementById('p-catalogo').classList.remove('hidden'); }
-        function config() { const p = prompt("Clave:"); if(p==="1234") { const u = prompt("URL Script:", scriptURL); if(u) { localStorage.setItem('panchito_url', u.trim()); location.reload(); } } }
+        function remove(idx) { 
+            cart.splice(idx,1); 
+            document.getElementById('badge').innerText = cart.length; 
+            if(cart.length===0) back(); else verCarrito(); 
+        }
+
+        function back() { 
+            document.getElementById('p-carrito').classList.add('hidden'); 
+            document.getElementById('p-catalogo').classList.remove('hidden'); 
+        }
+
+        function config() { 
+            const p = prompt("Clave:"); 
+            if(p==="1234") { 
+                const u = prompt("URL Script:", scriptURL); 
+                if(u) { localStorage.setItem('panchito_url', u.trim()); location.reload(); } 
+            } 
+        }
 
         async function sendOrder() {
             const btn = document.getElementById('btn-send');
@@ -168,7 +219,11 @@
                 });
                 alert("✅ ¡PEDIDO ENVIADO!");
                 cart = []; location.reload();
-            } catch(e) { alert("Error de red"); btn.innerText = "ENVIAR PEDIDO"; btn.disabled = false; }
+            } catch(e) { 
+                alert("Error de red"); 
+                btn.innerText = "ENVIAR PEDIDO"; 
+                btn.disabled = false; 
+            }
         }
     </script>
 </body>
