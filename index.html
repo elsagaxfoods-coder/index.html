@@ -1,188 +1,173 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panchito Shoes Sistema</title>
+    <title>Panchito Shoes V3</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-900 text-white font-sans">
 
-    <header class="p-4 bg-slate-800 flex justify-between items-center border-b border-slate-700">
-        <h1 class="font-bold uppercase text-orange-500">Panchito Shoes</h1>
+    <header class="p-4 bg-slate-800 flex justify-between items-center shadow-xl">
+        <h1 class="font-bold text-orange-500">PANCHITO APP</h1>
         <div class="flex gap-4">
-            <button id="btn-cart" class="bg-slate-700 p-2 rounded-full relative">🛒 <span id="count" class="font-bold">0</span></button>
-            <button id="btn-cfg" class="text-slate-500">⚙️</button>
+            <button id="abrir-carrito" class="bg-slate-700 p-2 rounded-full relative">🛒 <span id="contador" class="font-bold">0</span></button>
+            <button id="abrir-ajustes" class="text-slate-500">⚙️</button>
         </div>
     </header>
 
     <main class="p-4 max-w-md mx-auto">
-        <!-- VISTA 1: ACCESO -->
-        <div id="view-login" class="mt-10 space-y-4">
-            <input type="text" id="user-name" placeholder="Tu Nombre de Vendedor" class="w-full p-4 bg-slate-800 rounded-xl border border-slate-700 outline-none">
-            <button id="btn-start" class="w-full bg-orange-600 p-4 rounded-xl font-bold uppercase shadow-lg">Entrar al Sistema</button>
+        <!-- PANTALLA 1: LOGIN -->
+        <div id="pantalla-login" class="mt-10 space-y-4">
+            <input type="text" id="vendedor-nombre" placeholder="Nombre del Vendedor" class="w-full p-4 bg-slate-800 rounded-xl border border-slate-700 outline-none">
+            <button id="boton-entrar" class="w-full bg-orange-600 p-4 rounded-xl font-bold uppercase">Entrar al Catalogo</button>
         </div>
 
-        <!-- VISTA 2: CATALOGO -->
-        <div id="view-catalog" class="hidden grid grid-cols-2 gap-4"></div>
+        <!-- PANTALLA 2: PRODUCTOS -->
+        <div id="pantalla-catalogo" class="hidden grid grid-cols-2 gap-4"></div>
 
-        <!-- VISTA 3: CARRITO -->
-        <div id="view-cart" class="hidden space-y-4">
-            <h2 class="text-xl font-bold">Resumen de Pedido</h2>
-            <div id="cart-items" class="space-y-2"></div>
-            <button id="btn-send" class="w-full bg-green-600 p-4 rounded-xl font-bold uppercase">Confirmar y Enviar</button>
-            <button id="btn-back" class="w-full text-slate-500 py-2">Regresar al catálogo</button>
+        <!-- PANTALLA 3: RESUMEN -->
+        <div id="pantalla-carrito" class="hidden space-y-4">
+            <div id="lista-items" class="space-y-2"></div>
+            <button id="boton-finalizar" class="w-full bg-green-600 p-4 rounded-xl font-bold">ENVIAR A EXCEL</button>
+            <button id="boton-volver" class="w-full text-slate-500 py-2">Seguir comprando</button>
         </div>
 
-        <!-- MODAL: OPCIONES -->
-        <div id="modal-box" class="hidden fixed inset-0 bg-black/90 flex items-end z-50">
+        <!-- MODAL SELECCION -->
+        <div id="modal-pedidos" class="hidden fixed inset-0 bg-black/90 flex items-end z-50">
             <div class="bg-slate-800 w-full p-6 rounded-t-3xl space-y-4">
-                <h3 id="modal-title" class="text-xl font-bold text-orange-500 uppercase"></h3>
-                <label class="block text-xs text-slate-400">Talla:</label>
-                <select id="sel-t" class="w-full p-3 bg-slate-900 rounded border border-slate-700"></select>
-                <label class="block text-xs text-slate-400">Color:</label>
-                <select id="sel-c" class="w-full p-3 bg-slate-900 rounded border border-slate-700"></select>
-                <label class="block text-xs text-slate-400">Cantidad:</label>
-                <input type="number" id="sel-n" value="1" min="1" class="w-full p-3 bg-slate-900 rounded text-center text-orange-500 font-bold">
-                <button id="btn-add-item" class="w-full bg-orange-600 p-4 rounded-xl font-bold uppercase">Agregar al carrito</button>
-                <button id="btn-close-modal" class="w-full text-slate-400 py-2">Cancelar</button>
+                <h3 id="titulo-modelo" class="text-xl font-bold text-orange-500 uppercase"></h3>
+                <select id="opcion-talla" class="w-full p-3 bg-slate-900 rounded border border-slate-700"></select>
+                <select id="opcion-color" class="w-full p-3 bg-slate-900 rounded border border-slate-700"></select>
+                <input type="number" id="opcion-cantidad" value="1" min="1" class="w-full p-3 bg-slate-900 rounded text-center text-orange-500 font-bold">
+                <button id="boton-agregar" class="w-full bg-orange-600 p-4 rounded-xl font-bold">AÑADIR AL PEDIDO</button>
+                <button id="boton-cerrar-modal" class="w-full text-slate-400 py-2">Cancelar</button>
             </div>
         </div>
     </main>
 
     <script>
-        // Variables globales sin sintaxis compleja
-        var globalData = {};
-        var globalCart = [];
-        var activeModel = "";
+        var datosLocales = {};
+        var carritoLocal = [];
+        var modeloSeleccionado = "";
 
-        // 1. Configuración de URL
-        document.getElementById('btn-cfg').onclick = function() {
-            var pass = prompt("Clave:");
-            if (pass === "1234") {
-                var current = localStorage.getItem('ps_url_v2') || "";
-                var link = prompt("Pega la URL del Script (terminada en /exec):", current);
-                if (link) {
-                    localStorage.setItem('ps_url_v2', link.trim());
+        // CONFIGURACION URL
+        document.getElementById('abrir-ajustes').onclick = function() {
+            var p = prompt("Clave:");
+            if (p === "1234") {
+                var url = prompt("Pega la NUEVA URL del Script:", localStorage.getItem('url_final') || "");
+                if (url) {
+                    localStorage.setItem('url_final', url.trim());
                     location.reload();
                 }
             }
         };
 
-        // 2. Cargar Catálogo
-        document.getElementById('btn-start').onclick = function() {
-            var user = document.getElementById('user-name').value;
-            var url = localStorage.getItem('ps_url_v2');
-            if (!user) return alert("Escribe tu nombre");
-            if (!url) return alert("Configura la URL en el engranaje ⚙️");
+        // ENTRAR Y CARGAR
+        document.getElementById('boton-entrar').onclick = function() {
+            var nom = document.getElementById('vendedor-nombre').value;
+            var endpoint = localStorage.getItem('url_final');
+            if (!nom || !endpoint) return alert("Nombre vacio o falta URL en ⚙️");
 
             var btn = this;
-            btn.innerText = "CARGANDO...";
-            btn.disabled = true;
-
-            fetch(url)
-                .then(function(res) { return res.json(); })
-                .then(function(data) {
-                    globalData = data.inventario;[cite: 1, 2]
-                    var grid = document.getElementById('view-catalog');
-                    grid.innerHTML = "";
+            btn.innerText = "CONECTANDO...";
+            
+            fetch(endpoint)
+                .then(function(r) { return r.json(); })
+                .then(function(d) {
+                    datosLocales = d.inventario;[cite: 1, 2]
+                    var cont = document.getElementById('pantalla-catalogo');
+                    cont.innerHTML = "";
                     
-                    Object.keys(globalData).forEach(function(key) {
-                        var card = document.createElement('div');
-                        card.className = "bg-slate-800 p-2 rounded-xl border border-slate-700 text-center";
-                        card.innerHTML = '<img src="' + globalData[key].foto + '" class="h-32 w-full object-cover rounded-lg mb-2"><p class="text-[10px] font-bold uppercase">' + key + '</p>';
-                        card.onclick = function() { 
-                            activeModel = key;
-                            document.getElementById('modal-title').innerText = key;
-                            document.getElementById('sel-t').innerHTML = globalData[key].tallas.map(function(t){ return '<option>'+t+'</option>'; }).join('');
-                            document.getElementById('sel-c').innerHTML = globalData[key].colores.map(function(c){ return '<option>'+c+'</option>'; }).join('');
-                            document.getElementById('modal-box').classList.remove('hidden');
+                    Object.keys(datosLocales).forEach(function(k) {
+                        var div = document.createElement('div');
+                        div.className = "bg-slate-800 p-2 rounded-xl border border-slate-700 text-center";
+                        div.innerHTML = '<img src="'+datosLocales[k].foto+'" class="h-32 w-full object-cover rounded-lg mb-2"><p class="text-[10px] font-bold uppercase">'+k+'</p>';
+                        div.onclick = function() {
+                            modeloSeleccionado = k;
+                            document.getElementById('titulo-modelo').innerText = k;
+                            document.getElementById('opcion-talla').innerHTML = datosLocales[k].tallas.map(function(t){ return '<option>'+t+'</option>'; }).join('');
+                            document.getElementById('opcion-color').innerHTML = datosLocales[k].colores.map(function(c){ return '<option>'+c+'</option>'; }).join('');
+                            document.getElementById('modal-pedidos').classList.remove('hidden');
                         };
-                        grid.appendChild(card);
+                        cont.appendChild(div);
                     });[cite: 2]
 
-                    document.getElementById('view-login').classList.add('hidden');
-                    document.getElementById('view-catalog').classList.remove('hidden');
+                    document.getElementById('pantalla-login').classList.add('hidden');
+                    document.getElementById('pantalla-catalogo').classList.remove('hidden');
                 })
-                .catch(function(err) {
-                    alert("Error al conectar con la base de datos: " + err);
-                    btn.innerText = "Entrar al Sistema";
-                    btn.disabled = false;
-                });
+                .catch(function(e) { alert("Error: " + e); btn.innerText = "Entrar"; });
         };
 
-        // 3. Carrito y Modal
-        document.getElementById('btn-close-modal').onclick = function() { document.getElementById('modal-box').classList.add('hidden'); };
-
-        document.getElementById('btn-add-item').onclick = function() {
-            globalCart.push({
-                m: activeModel,
-                t: document.getElementById('sel-t').value,
-                c: document.getElementById('sel-c').value,
-                n: document.getElementById('sel-n').value,
+        // AGREGAR
+        document.getElementById('boton-agregar').onclick = function() {
+            carritoLocal.push({
+                m: modeloSeleccionado,
+                t: document.getElementById('opcion-talla').value,
+                c: document.getElementById('opcion-color').value,
+                n: document.getElementById('opcion-cantidad').value,
                 tipo: "Normal",
-                img: globalData[activeModel].foto
+                img: datosLocales[modeloSeleccionado].foto
             });
-            document.getElementById('count').innerText = globalCart.length;
-            document.getElementById('modal-box').classList.add('hidden');
+            document.getElementById('contador').innerText = carritoLocal.length;
+            document.getElementById('modal-pedidos').classList.add('hidden');
         };
 
-        document.getElementById('btn-cart').onclick = function() {
-            if (globalCart.length === 0) return alert("El carrito está vacío");
-            document.getElementById('view-catalog').classList.add('hidden');
-            document.getElementById('view-cart').classList.remove('hidden');
+        document.getElementById('boton-cerrar-modal').onclick = function() { document.getElementById('modal-pedidos').classList.add('hidden'); };
+
+        // VER CARRITO
+        document.getElementById('abrir-carrito').onclick = function() {
+            if (carritoLocal.length === 0) return alert("Vacio");
+            document.getElementById('pantalla-catalogo').classList.add('hidden');
+            document.getElementById('pantalla-carrito').classList.remove('hidden');
             
-            var list = document.getElementById('cart-items');
-            list.innerHTML = "";
-            globalCart.forEach(function(item, idx) {
-                var div = document.createElement('div');
-                div.className = "bg-slate-800 p-3 rounded-lg border border-slate-700 flex justify-between";
-                div.innerHTML = '<div><p class="text-xs font-bold uppercase">' + item.m + '</p><p class="text-[10px] text-slate-400">Talla ' + item.t + ' | ' + item.n + ' pares</p></div>';
-                var del = document.createElement('button');
-                del.innerText = "ELIMINAR";
-                del.className = "text-red-500 text-[10px] font-bold";
-                del.onclick = function() {
-                    globalCart.splice(idx, 1);
-                    document.getElementById('count').innerText = globalCart.length;
-                    if (globalCart.length === 0) {
-                        document.getElementById('view-cart').classList.add('hidden');
-                        document.getElementById('view-catalog').classList.remove('hidden');
+            var divLista = document.getElementById('lista-items');
+            divLista.innerHTML = "";
+            carritoLocal.forEach(function(item, i) {
+                var d = document.createElement('div');
+                d.className = "bg-slate-800 p-3 rounded-lg border border-slate-700 flex justify-between";
+                d.innerHTML = '<div><p class="text-xs font-bold uppercase">'+item.m+'</p><p class="text-[10px]">Talla '+item.t+' | Cant: '+item.n+'</p></div>';
+                var b = document.createElement('button');
+                b.innerText = "BORRAR";
+                b.className = "text-red-500 text-xs";
+                b.onclick = function() {
+                    carritoLocal.splice(i, 1);
+                    document.getElementById('contador').innerText = carritoLocal.length;
+                    if (carritoLocal.length === 0) {
+                        document.getElementById('pantalla-carrito').classList.add('hidden');
+                        document.getElementById('pantalla-catalogo').classList.remove('hidden');
                     } else {
-                        document.getElementById('btn-cart').onclick();
+                        document.getElementById('abrir-carrito').onclick();
                     }
                 };
-                div.appendChild(del);
-                list.appendChild(div);
+                d.appendChild(b);
+                divLista.appendChild(d);
             });
         };
 
-        document.getElementById('btn-back').onclick = function() {
-            document.getElementById('view-cart').classList.add('hidden');
-            document.getElementById('view-catalog').classList.remove('hidden');
+        document.getElementById('boton-volver').onclick = function() {
+            document.getElementById('pantalla-carrito').classList.add('hidden');
+            document.getElementById('pantalla-catalogo').classList.remove('hidden');
         };
 
-        // 4. Enviar Pedido Final
-        document.getElementById('btn-send').onclick = function() {
-            var url = localStorage.getItem('ps_url_v2');
-            var btn = this;
-            btn.innerText = "ENVIANDO...";
-            btn.disabled = true;
+        // ENVIAR POST[cite: 1]
+        document.getElementById('boton-finalizar').onclick = function() {
+            var urlPost = localStorage.getItem('url_final');
+            var bFinal = this;
+            bFinal.innerText = "ENVIANDO...";
+            bFinal.disabled = true;
 
-            fetch(url, {
+            fetch(urlPost, {
                 method: 'POST',
                 mode: 'no-cors',
                 body: JSON.stringify({
-                    vendedor: document.getElementById('user-name').value,
-                    carrito: globalCart
+                    vendedor: document.getElementById('vendedor-nombre').value,
+                    carrito: carritoLocal
                 })
             }).then(function() {
-                alert("PEDIDO REGISTRADO EN GOOGLE SHEETS");
+                alert("PEDIDO ENVIADO");
                 location.reload();
-            }).catch(function(err) {
-                alert("Error al enviar: " + err);
-                btn.innerText = "Confirmar y Enviar";
-                btn.disabled = false;
-            });[cite: 1, 2]
+            }).catch(function(e) { alert("Error: " + e); bFinal.disabled = false; });[cite: 1, 2]
         };
     </script>
 </body>
