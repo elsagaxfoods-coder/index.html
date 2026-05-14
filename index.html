@@ -1,173 +1,134 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panchito Shoes V3</title>
+    <title>Panchito Shoes App</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-900 text-white font-sans">
+<body class="bg-black text-white">
 
-    <header class="p-4 bg-slate-800 flex justify-between items-center shadow-xl">
-        <h1 class="font-bold text-orange-500">PANCHITO APP</h1>
+    <header class="p-4 border-b border-orange-600 flex justify-between items-center bg-zinc-950">
+        <h1 class="text-orange-600 font-black italic text-xl">PANCHITO SHOES</h1>
         <div class="flex gap-4">
-            <button id="abrir-carrito" class="bg-slate-700 p-2 rounded-full relative">🛒 <span id="contador" class="font-bold">0</span></button>
-            <button id="abrir-ajustes" class="text-slate-500">⚙️</button>
+            <button id="ver-carrito" class="relative text-2xl">🛒<span id="cant" class="absolute -top-1 -right-2 bg-orange-600 text-black text-[10px] font-bold px-1 rounded-full">0</span></button>
+            <button id="abrir-ajustes" class="text-zinc-600">⚙️</button>
         </div>
     </header>
 
     <main class="p-4 max-w-md mx-auto">
-        <!-- PANTALLA 1: LOGIN -->
-        <div id="pantalla-login" class="mt-10 space-y-4">
-            <input type="text" id="vendedor-nombre" placeholder="Nombre del Vendedor" class="w-full p-4 bg-slate-800 rounded-xl border border-slate-700 outline-none">
-            <button id="boton-entrar" class="w-full bg-orange-600 p-4 rounded-xl font-bold uppercase">Entrar al Catalogo</button>
+        <!-- LOGIN -->
+        <div id="v-login" class="mt-20 space-y-6 text-center">
+            <input type="text" id="vendedor" placeholder="NOMBRE DEL VENDEDOR" class="w-full bg-zinc-900 border-b-2 border-orange-600 p-4 outline-none text-center font-bold">
+            <button id="btn-entrar" class="w-full bg-orange-600 text-black font-black py-4 rounded-xl">ACCEDER AL CATALOGO</button>
         </div>
 
-        <!-- PANTALLA 2: PRODUCTOS -->
-        <div id="pantalla-catalogo" class="hidden grid grid-cols-2 gap-4"></div>
+        <!-- CATALOGO -->
+        <div id="v-catalogo" class="hidden grid grid-cols-2 gap-4"></div>
 
-        <!-- PANTALLA 3: RESUMEN -->
-        <div id="pantalla-carrito" class="hidden space-y-4">
-            <div id="lista-items" class="space-y-2"></div>
-            <button id="boton-finalizar" class="w-full bg-green-600 p-4 rounded-xl font-bold">ENVIAR A EXCEL</button>
-            <button id="boton-volver" class="w-full text-slate-500 py-2">Seguir comprando</button>
+        <!-- CARRITO -->
+        <div id="v-carrito" class="hidden space-y-4">
+            <h2 class="text-orange-600 font-bold text-center">TUS PEDIDOS</h2>
+            <div id="lista-pedido" class="space-y-2"></div>
+            <button id="btn-enviar" class="w-full bg-orange-600 text-black font-black py-4 rounded-xl">CONFIRMAR PEDIDO</button>
+            <button onclick="irACatalogo()" class="w-full text-zinc-500 text-sm py-2">Volver</button>
         </div>
 
-        <!-- MODAL SELECCION -->
-        <div id="modal-pedidos" class="hidden fixed inset-0 bg-black/90 flex items-end z-50">
-            <div class="bg-slate-800 w-full p-6 rounded-t-3xl space-y-4">
-                <h3 id="titulo-modelo" class="text-xl font-bold text-orange-500 uppercase"></h3>
-                <select id="opcion-talla" class="w-full p-3 bg-slate-900 rounded border border-slate-700"></select>
-                <select id="opcion-color" class="w-full p-3 bg-slate-900 rounded border border-slate-700"></select>
-                <input type="number" id="opcion-cantidad" value="1" min="1" class="w-full p-3 bg-slate-900 rounded text-center text-orange-500 font-bold">
-                <button id="boton-agregar" class="w-full bg-orange-600 p-4 rounded-xl font-bold">AÑADIR AL PEDIDO</button>
-                <button id="boton-cerrar-modal" class="w-full text-slate-400 py-2">Cancelar</button>
+        <!-- MODAL -->
+        <div id="modal" class="hidden fixed inset-0 bg-black/90 flex items-end z-50">
+            <div class="w-full p-6 bg-zinc-900 rounded-t-3xl border-t border-orange-600 space-y-4">
+                <h3 id="mod-titulo" class="text-orange-600 font-bold text-xl uppercase"></h3>
+                <div class="grid grid-cols-2 gap-2">
+                    <select id="mod-talla" class="bg-black p-3 border border-zinc-800"></select>
+                    <select id="mod-color" class="bg-black p-3 border border-zinc-800"></select>
+                </div>
+                <input type="number" id="mod-n" value="1" min="1" class="w-full bg-black p-3 text-center text-orange-600 font-bold">
+                <button id="btn-add" class="w-full bg-orange-600 text-black font-black py-4 rounded-xl">AÑADIR</button>
+                <button onclick="cerrarModal()" class="w-full text-zinc-500">Cerrar</button>
             </div>
         </div>
     </main>
 
     <script>
-        var datosLocales = {};
-        var carritoLocal = [];
-        var modeloSeleccionado = "";
+        var inventario = {};
+        var carrito = [];
+        var modeloActivo = "";
 
-        // CONFIGURACION URL
+        // CONFIGURAR
         document.getElementById('abrir-ajustes').onclick = function() {
-            var p = prompt("Clave:");
-            if (p === "1234") {
-                var url = prompt("Pega la NUEVA URL del Script:", localStorage.getItem('url_final') || "");
-                if (url) {
-                    localStorage.setItem('url_final', url.trim());
-                    location.reload();
-                }
+            var clave = prompt("Pass:");
+            if(clave === "1234") {
+                var url = prompt("Nueva URL de Google:", localStorage.getItem('url_panchito') || "");
+                if(url) { localStorage.setItem('url_panchito', url.trim()); location.reload(); }
             }
         };
 
-        // ENTRAR Y CARGAR
-        document.getElementById('boton-entrar').onclick = function() {
-            var nom = document.getElementById('vendedor-nombre').value;
-            var endpoint = localStorage.getItem('url_final');
-            if (!nom || !endpoint) return alert("Nombre vacio o falta URL en ⚙️");
+        // ENTRAR
+        document.getElementById('btn-entrar').onclick = function() {
+            var vend = document.getElementById('vendedor').value;
+            var url = localStorage.getItem('url_panchito');
+            if(!vend || !url) return alert("Faltan datos o URL");
 
-            var btn = this;
-            btn.innerText = "CONECTANDO...";
-            
-            fetch(endpoint)
-                .then(function(r) { return r.json(); })
-                .then(function(d) {
-                    datosLocales = d.inventario;[cite: 1, 2]
-                    var cont = document.getElementById('pantalla-catalogo');
-                    cont.innerHTML = "";
-                    
-                    Object.keys(datosLocales).forEach(function(k) {
-                        var div = document.createElement('div');
-                        div.className = "bg-slate-800 p-2 rounded-xl border border-slate-700 text-center";
-                        div.innerHTML = '<img src="'+datosLocales[k].foto+'" class="h-32 w-full object-cover rounded-lg mb-2"><p class="text-[10px] font-bold uppercase">'+k+'</p>';
-                        div.onclick = function() {
-                            modeloSeleccionado = k;
-                            document.getElementById('titulo-modelo').innerText = k;
-                            document.getElementById('opcion-talla').innerHTML = datosLocales[k].tallas.map(function(t){ return '<option>'+t+'</option>'; }).join('');
-                            document.getElementById('opcion-color').innerHTML = datosLocales[k].colores.map(function(c){ return '<option>'+c+'</option>'; }).join('');
-                            document.getElementById('modal-pedidos').classList.remove('hidden');
-                        };
-                        cont.appendChild(div);
-                    });[cite: 2]
-
-                    document.getElementById('pantalla-login').classList.add('hidden');
-                    document.getElementById('pantalla-catalogo').classList.remove('hidden');
-                })
-                .catch(function(e) { alert("Error: " + e); btn.innerText = "Entrar"; });
+            this.innerText = "CARGANDO...";
+            fetch(url).then(r => r.json()).then(data => {
+                inventario = data.productos;
+                var grid = document.getElementById('v-catalogo');
+                grid.innerHTML = "";
+                Object.keys(inventario).forEach(key => {
+                    var card = document.createElement('div');
+                    card.className = "bg-zinc-900 p-2 border border-zinc-800 text-center rounded-lg";
+                    card.innerHTML = '<img src="'+inventario[key].foto+'" class="h-32 w-full object-cover rounded mb-2"><p class="text-[10px] font-bold">'+key+'</p>';
+                    card.onclick = () => {
+                        modeloActivo = key;
+                        document.getElementById('mod-titulo').innerText = key;
+                        document.getElementById('mod-talla').innerHTML = inventario[key].tallas.map(t => '<option>'+t+'</option>').join('');
+                        document.getElementById('mod-color').innerHTML = inventario[key].colores.map(c => '<option>'+c+'</option>').join('');
+                        document.getElementById('modal').classList.remove('hidden');
+                    };
+                    grid.appendChild(card);
+                });
+                document.getElementById('v-login').classList.add('hidden');
+                document.getElementById('v-catalogo').classList.remove('hidden');
+            }).catch(e => { alert("Error de conexión"); this.innerText = "REINTENTAR"; });
         };
 
-        // AGREGAR
-        document.getElementById('boton-agregar').onclick = function() {
-            carritoLocal.push({
-                m: modeloSeleccionado,
-                t: document.getElementById('opcion-talla').value,
-                c: document.getElementById('opcion-color').value,
-                n: document.getElementById('opcion-cantidad').value,
-                tipo: "Normal",
-                img: datosLocales[modeloSeleccionado].foto
-            });
-            document.getElementById('contador').innerText = carritoLocal.length;
-            document.getElementById('modal-pedidos').classList.add('hidden');
+        // ACCIONES
+        function cerrarModal() { document.getElementById('modal').classList.add('hidden'); }
+        function irACatalogo() { document.getElementById('v-carrito').classList.add('hidden'); document.getElementById('v-catalogo').classList.remove('hidden'); }
+
+        document.getElementById('btn-add').onclick = function() {
+            carrito.push({ m: modeloActivo, t: document.getElementById('mod-talla').value, c: document.getElementById('mod-color').value, n: document.getElementById('mod-n').value, img: inventario[modeloActivo].foto });
+            document.getElementById('cant').innerText = carrito.length;
+            cerrarModal();
         };
 
-        document.getElementById('boton-cerrar-modal').onclick = function() { document.getElementById('modal-pedidos').classList.add('hidden'); };
-
-        // VER CARRITO
-        document.getElementById('abrir-carrito').onclick = function() {
-            if (carritoLocal.length === 0) return alert("Vacio");
-            document.getElementById('pantalla-catalogo').classList.add('hidden');
-            document.getElementById('pantalla-carrito').classList.remove('hidden');
-            
-            var divLista = document.getElementById('lista-items');
-            divLista.innerHTML = "";
-            carritoLocal.forEach(function(item, i) {
+        document.getElementById('ver-carrito').onclick = function() {
+            if(carrito.length === 0) return alert("Carrito vacío");
+            document.getElementById('v-catalogo').classList.add('hidden');
+            document.getElementById('v-carrito').classList.remove('hidden');
+            var list = document.getElementById('lista-pedido');
+            list.innerHTML = "";
+            carrito.forEach((item, i) => {
                 var d = document.createElement('div');
-                d.className = "bg-slate-800 p-3 rounded-lg border border-slate-700 flex justify-between";
-                d.innerHTML = '<div><p class="text-xs font-bold uppercase">'+item.m+'</p><p class="text-[10px]">Talla '+item.t+' | Cant: '+item.n+'</p></div>';
-                var b = document.createElement('button');
-                b.innerText = "BORRAR";
-                b.className = "text-red-500 text-xs";
-                b.onclick = function() {
-                    carritoLocal.splice(i, 1);
-                    document.getElementById('contador').innerText = carritoLocal.length;
-                    if (carritoLocal.length === 0) {
-                        document.getElementById('pantalla-carrito').classList.add('hidden');
-                        document.getElementById('pantalla-catalogo').classList.remove('hidden');
-                    } else {
-                        document.getElementById('abrir-carrito').onclick();
-                    }
-                };
-                d.appendChild(b);
-                divLista.appendChild(d);
+                d.className = "bg-zinc-900 p-3 border border-zinc-800 flex justify-between";
+                d.innerHTML = '<div><p class="font-bold text-xs">'+item.m+'</p><p class="text-[10px]">Talla '+item.t+' | '+item.n+' pares</p></div>';
+                var del = document.createElement('button');
+                del.innerText = "X";
+                del.className = "text-orange-600 font-bold px-2";
+                del.onclick = () => { carrito.splice(i,1); document.getElementById('cant').innerText = carrito.length; document.getElementById('ver-carrito').onclick(); };
+                d.appendChild(del);
+                list.appendChild(d);
             });
         };
 
-        document.getElementById('boton-volver').onclick = function() {
-            document.getElementById('pantalla-carrito').classList.add('hidden');
-            document.getElementById('pantalla-catalogo').classList.remove('hidden');
-        };
-
-        // ENVIAR POST[cite: 1]
-        document.getElementById('boton-finalizar').onclick = function() {
-            var urlPost = localStorage.getItem('url_final');
-            var bFinal = this;
-            bFinal.innerText = "ENVIANDO...";
-            bFinal.disabled = true;
-
-            fetch(urlPost, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({
-                    vendedor: document.getElementById('vendedor-nombre').value,
-                    carrito: carritoLocal
-                })
-            }).then(function() {
-                alert("PEDIDO ENVIADO");
-                location.reload();
-            }).catch(function(e) { alert("Error: " + e); bFinal.disabled = false; });[cite: 1, 2]
+        // ENVIAR
+        document.getElementById('btn-enviar').onclick = function() {
+            var url = localStorage.getItem('url_panchito');
+            this.innerText = "ENVIANDO...";
+            this.disabled = true;
+            fetch(url, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ vendedor: document.getElementById('vendedor').value, carrito: carrito }) })
+            .then(() => { alert("¡PEDIDO LISTO!"); location.reload(); })
+            .catch(() => { alert("Error al enviar"); this.disabled = false; });
         };
     </script>
 </body>
