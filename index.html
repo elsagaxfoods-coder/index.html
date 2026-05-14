@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panchito Shoes | Oficial</title>
+    <title>Panchito Shoes | Catálogo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #000000; color: #ffffff; }
+        body { background-color: #000000; color: #ffffff; font-family: sans-serif; }
         .accent-orange { color: #f97316; }
         .bg-orange-custom { background-color: #f97316; }
         .border-orange-custom { border-color: #f97316; }
         .card-shoe { background-color: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 1rem; overflow: hidden; }
-        .card-shoe img { filter: none !important; width: 100%; height: 120px; object-cover: cover; }
+        .card-shoe img { width: 100%; height: 130px; object-fit: cover; }
         select, input { background-color: #111; border: 1px solid #333; color: white; padding: 12px; border-radius: 8px; outline: none; width: 100%; }
+        select:focus { border-color: #f97316; }
     </style>
 </head>
 <body>
@@ -22,21 +23,21 @@
             <img id="img-logo" src="" class="h-10 w-10 object-contain hidden border border-orange-custom rounded-full">
             <h1 id="txt-header" class="font-black italic text-xl accent-orange uppercase">Panchito Shoes</h1>
         </div>
-        <div class="flex gap-4">
-            <button id="btn-cart-view" class="relative text-2xl">
-                🛒<span id="badge" class="absolute -top-1 -right-2 bg-orange-custom text-black text-[10px] font-bold px-1.5 rounded-full">0</span>
-            </button>
-            <button id="btn-setup" class="text-zinc-800">⚙️</button>
-        </div>
+        <button id="btn-cart-view" class="relative text-2xl">
+            🛒<span id="badge" class="absolute -top-1 -right-2 bg-orange-custom text-black text-[10px] font-bold px-1.5 rounded-full">0</span>
+        </button>
     </header>
 
     <main class="p-4 max-w-md mx-auto">
+        <!-- SECCIÓN LOGIN -->
         <div id="view-login" class="mt-20 space-y-6 text-center">
-            <h2 class="text-2xl font-bold italic uppercase">Bienvenido</h2>
-            <input type="text" id="vendedor" placeholder="TU NOMBRE" class="text-center uppercase font-bold text-xl">
-            <button id="btn-login" class="w-full bg-orange-custom text-black font-black py-4 rounded-xl">ACCEDER</button>
+            <h2 class="text-3xl font-bold italic uppercase tracking-tighter">Bienvenido</h2>
+            <p class="text-zinc-500 text-sm">Ingresa tu nombre para comenzar</p>
+            <input type="text" id="vendedor" placeholder="NOMBRE COMPLETO" class="text-center uppercase font-bold text-xl border-orange-custom">
+            <button id="btn-login" class="w-full bg-orange-custom text-black font-black py-4 rounded-xl text-lg">ACCEDER</button>
         </div>
 
+        <!-- SECCIÓN CATÁLOGO -->
         <div id="view-catalog" class="hidden space-y-4">
             <div id="container-banner" class="hidden w-full rounded-2xl overflow-hidden border border-zinc-800">
                 <img id="img-banner" src="" class="w-full h-auto object-cover">
@@ -44,48 +45,55 @@
             <div id="grid-products" class="grid grid-cols-2 gap-3"></div>
         </div>
 
+        <!-- SECCIÓN CARRITO -->
         <div id="view-cart" class="hidden space-y-4">
-            <h2 class="text-orange-500 font-bold text-center italic">PEDIDO ACTUAL</h2>
+            <h2 class="text-orange-500 font-bold text-center italic text-xl">TU PEDIDO</h2>
             <div id="cart-list" class="space-y-2"></div>
-            <button id="btn-submit" class="w-full bg-orange-custom text-black font-black py-4 rounded-xl uppercase">Enviar Pedido</button>
-            <button id="btn-back" class="w-full text-zinc-500 text-xs uppercase py-2">Volver</button>
+            <button id="btn-submit" class="w-full bg-orange-custom text-black font-black py-4 rounded-xl uppercase shadow-lg shadow-orange-900/20">Enviar a Fabricación</button>
+            <button id="btn-back" class="w-full text-zinc-500 text-xs uppercase py-2">← Seguir viendo modelos</button>
         </div>
 
+        <!-- MODAL DE PRODUCTO -->
         <div id="modal" class="hidden fixed inset-0 bg-black/95 flex items-end z-[100]">
-            <div class="w-full p-8 bg-zinc-950 rounded-t-[3rem] border-t border-orange-custom space-y-5">
-                <h3 id="m-name" class="text-xl font-black accent-orange italic uppercase text-center"></h3>
-                <select id="m-tipo"><option value="Normal">NORMAL</option><option value="Personalizado">PERSONALIZADO</option></select>
-                <div class="grid grid-cols-2 gap-4">
-                    <select id="m-talla"></select>
-                    <select id="m-color"></select>
+            <div class="w-full p-8 bg-zinc-950 rounded-t-[3rem] border-t border-orange-custom space-y-5 animate-slide-up">
+                <h3 id="m-name" class="text-2xl font-black accent-orange italic uppercase text-center"></h3>
+                
+                <div>
+                    <label class="text-[10px] text-zinc-500 font-bold ml-1">ACABADO</label>
+                    <select id="m-tipo"><option value="Normal">NORMAL (LÍNEA)</option><option value="Personalizado">PERSONALIZADO (CHEF)</option></select>
                 </div>
-                <input type="number" id="m-cant" value="1" min="1" class="text-orange-500 font-black text-4xl text-center border-none bg-transparent">
-                <button id="btn-add" class="w-full bg-orange-custom text-black font-black py-4 rounded-xl">AÑADIR</button>
-                <button id="btn-close" class="w-full text-zinc-600 font-bold">CANCELAR</button>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="text-[10px] text-zinc-500 font-bold ml-1">TALLA</label><select id="m-talla"></select></div>
+                    <div><label class="text-[10px] text-zinc-500 font-bold ml-1">COLOR</label><select id="m-color"></select></div>
+                </div>
+
+                <div class="text-center">
+                    <label class="text-[10px] text-zinc-500 font-bold">CANTIDAD DE PARES</label>
+                    <input type="number" id="m-cant" value="1" min="1" class="text-orange-500 font-black text-4xl text-center bg-transparent border-none">
+                </div>
+
+                <button id="btn-add" class="w-full bg-orange-custom text-black font-black py-4 rounded-xl text-lg">AGREGAR AL CARRITO</button>
+                <button id="btn-close" class="w-full text-zinc-600 font-bold text-sm uppercase">Cerrar</button>
             </div>
         </div>
     </main>
 
     <script>
+        // PEGA AQUÍ TU URL DE GOOGLE (LA QUE TERMINA EN /exec)
+        const URL_DEL_SCRIPT = "TU_URL_AQUI"; 
+        
         let appData = {};
         let cart = [];
         let currentModel = "";
-        const storageKey = 'panchito_shoes_definitivo';
-
-        document.getElementById('btn-setup').onclick = () => {
-            if(prompt("Clave:") === "1234") {
-                const u = prompt("URL del Script:", localStorage.getItem(storageKey) || "");
-                if(u) { localStorage.setItem(storageKey, u.trim()); location.reload(); }
-            }
-        };
 
         document.getElementById('btn-login').onclick = function() {
             const user = document.getElementById('vendedor').value;
-            const url = localStorage.getItem(storageKey);
-            if(!user || !url) return alert("Configura la URL en el engranaje ⚙️");
+            if(!user) return alert("Por favor, ingresa tu nombre");
+            if(URL_DEL_SCRIPT === "TU_URL_AQUI") return alert("Error técnico: Falta vincular la URL en el código.");
 
-            this.innerText = "CARGANDO...";
-            fetch(url).then(r => r.json()).then(data => {
+            this.innerText = "SINCRO...";
+            fetch(URL_DEL_SCRIPT).then(r => r.json()).then(data => {
                 appData = data.productos;
                 if(data.logo) { document.getElementById('img-logo').src = data.logo; document.getElementById('img-logo').classList.remove('hidden'); document.getElementById('txt-header').classList.add('hidden'); }
                 if(data.banner) { document.getElementById('img-banner').src = data.banner; document.getElementById('container-banner').classList.remove('hidden'); }
@@ -94,8 +102,8 @@
                 grid.innerHTML = "";
                 Object.keys(appData).forEach(key => {
                     const div = document.createElement('div');
-                    div.className = "card-shoe p-2 text-center";
-                    div.innerHTML = `<img src="${appData[key].foto}"><p class="text-[10px] font-bold uppercase mt-2">${key}</p>`;
+                    div.className = "card-shoe p-2 text-center shadow-md";
+                    div.innerHTML = `<img src="${appData[key].foto}"><p class="text-[10px] font-bold uppercase mt-2 px-1 truncate accent-orange">${key}</p>`;
                     div.onclick = () => {
                         currentModel = key;
                         document.getElementById('m-name').innerText = key;
@@ -107,7 +115,7 @@
                 });
                 document.getElementById('view-login').classList.add('hidden');
                 document.getElementById('view-catalog').classList.remove('hidden');
-            }).catch(e => { alert("Error de URL"); this.innerText = "ACCEDER"; });
+            }).catch(e => { alert("Error de conexión con la base de datos."); this.innerText = "REINTENTAR"; });
         };
 
         document.getElementById('btn-close').onclick = () => document.getElementById('modal').classList.add('hidden');
@@ -119,17 +127,17 @@
         };
 
         document.getElementById('btn-cart-view').onclick = () => {
-            if(cart.length === 0) return;
+            if(cart.length === 0) return alert("Tu carrito está vacío");
             document.getElementById('view-catalog').classList.add('hidden');
             document.getElementById('view-cart').classList.remove('hidden');
             const list = document.getElementById('cart-list');
             list.innerHTML = "";
             cart.forEach((item, idx) => {
                 const div = document.createElement('div');
-                div.className = "bg-zinc-900 p-3 rounded-lg flex justify-between border border-zinc-800";
-                div.innerHTML = `<div><p class="text-xs font-bold uppercase accent-orange">${item.m} (${item.tipo})</p><p class="text-[10px] text-zinc-400">${item.t} | ${item.c} | ${item.n} par(es)</p></div>`;
+                div.className = "bg-zinc-900 p-3 rounded-xl flex justify-between items-center border border-zinc-800";
+                div.innerHTML = `<div><p class="text-xs font-bold uppercase accent-orange">${item.m} (${item.tipo})</p><p class="text-[10px] text-zinc-400 font-medium">Talla ${item.t} | ${item.c} | ${item.n} par(es)</p></div>`;
                 const del = document.createElement('button');
-                del.innerText = "X"; del.className = "text-red-500 font-bold px-2";
+                del.innerText = "×"; del.className = "text-red-500 font-black text-2xl px-2";
                 del.onclick = () => { cart.splice(idx,1); document.getElementById('badge').innerText = cart.length; if(cart.length===0) back(); else document.getElementById('btn-cart-view').onclick(); };
                 div.appendChild(del);
                 list.appendChild(div);
@@ -140,10 +148,10 @@
         document.getElementById('btn-back').onclick = back;
 
         document.getElementById('btn-submit').onclick = function() {
-            const url = localStorage.getItem(storageKey);
             this.innerText = "ENVIANDO...";
-            fetch(url, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ vendedor: document.getElementById('vendedor').value, carrito: cart }) })
-            .then(() => { alert("PEDIDO ENVIADO"); location.reload(); });
+            this.disabled = true;
+            fetch(URL_DEL_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ vendedor: document.getElementById('vendedor').value, carrito: cart }) })
+            .then(() => { alert("¡PEDIDO ENVIADO CON ÉXITO!"); location.reload(); });
         };
     </script>
 </body>
