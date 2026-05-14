@@ -11,9 +11,9 @@
         .bg-orange-custom { background-color: #f97316; }
         .border-orange-custom { border-color: #f97316; }
         .card-shoe { background-color: #0a0a0a; border: 1px solid #1a1a1a; }
-        /* Las imágenes ahora se verán siempre a color */
-        .card-shoe img { filter: none !important; transition: transform 0.2s; }
-        .card-shoe:active { border-color: #f97316; transform: scale(0.98); }
+        .card-shoe img { filter: none !important; } /* Imágenes a color */
+        select, input { background-color: #111; border: 1px solid #333; color: white; padding: 12px; border-radius: 8px; outline: none; }
+        select:focus { border-color: #f97316; }
     </style>
 </head>
 <body>
@@ -39,19 +39,17 @@
             </div>
             <div class="space-y-2">
                 <h2 class="text-2xl font-bold italic uppercase tracking-tighter">Bienvenido</h2>
-                <input type="text" id="vendedor" placeholder="ESCRIBE TU NOMBRE" class="w-full bg-transparent border-b-2 border-zinc-800 focus:border-orange-custom p-4 text-center outline-none uppercase font-bold text-xl">
+                <input type="text" id="vendedor" placeholder="ESCRIBE TU NOMBRE" class="w-full text-center uppercase font-bold text-xl">
             </div>
             <button id="btn-login" class="w-full bg-orange-custom text-black font-black py-4 rounded-xl">ACCEDER</button>
         </div>
 
         <!-- VISTA: CATALOGO -->
         <div id="view-catalog" class="hidden space-y-4">
-            <!-- BANNER DINÁMICO (Celda B2) -->
             <div id="container-banner" class="hidden w-full overflow-hidden rounded-2xl border border-zinc-800 shadow-lg">
                 <img id="img-banner" src="" class="w-full h-auto min-h-[120px] object-cover">
             </div>
-            
-            <h3 class="text-zinc-500 text-xs font-bold uppercase tracking-widest border-l-2 border-orange-custom pl-2">Catálogo de Modelos</h3>
+            <h3 class="text-zinc-500 text-xs font-bold uppercase tracking-widest border-l-2 border-orange-custom pl-2">Catálogo</h3>
             <div id="grid-products" class="grid grid-cols-2 gap-3"></div>
         </div>
 
@@ -60,21 +58,38 @@
             <h2 class="text-orange-500 font-bold text-center italic">RESUMEN DEL PEDIDO</h2>
             <div id="cart-list" class="space-y-2"></div>
             <button id="btn-submit" class="w-full bg-orange-custom text-black font-black py-4 rounded-xl">CONFIRMAR PEDIDO</button>
-            <button id="btn-back" class="w-full text-zinc-600 text-xs uppercase py-2">Seguir comprando</button>
+            <button id="btn-back" class="w-full text-zinc-600 text-xs uppercase py-2 text-center">Seguir comprando</button>
         </div>
 
         <!-- MODAL -->
         <div id="modal" class="hidden fixed inset-0 bg-black/95 flex items-end z-[100]">
-            <div class="w-full p-8 bg-zinc-950 rounded-t-[3rem] border-t border-orange-custom space-y-6">
+            <div class="w-full p-8 bg-zinc-950 rounded-t-[3rem] border-t border-orange-custom space-y-5">
                 <h3 id="m-name" class="text-xl font-black accent-orange italic uppercase text-center"></h3>
+                
+                <div class="space-y-1">
+                    <label class="text-[10px] text-zinc-500 font-bold ml-1 uppercase">Tipo de Pedido</label>
+                    <select id="m-tipo" class="w-full border-orange-custom">
+                        <option value="Normal">NORMAL</option>
+                        <option value="Personalizado">PERSONALIZADO</option>
+                    </select>
+                </div>
+
                 <div class="grid grid-cols-2 gap-4">
-                    <select id="m-talla" class="bg-black border border-zinc-800 p-4 rounded-xl text-white outline-none"></select>
-                    <select id="m-color" class="bg-black border border-zinc-800 p-4 rounded-xl text-white outline-none"></select>
+                    <div class="space-y-1">
+                        <label class="text-[10px] text-zinc-500 font-bold ml-1 uppercase">Talla</label>
+                        <select id="m-talla" class="w-full"></select>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] text-zinc-500 font-bold ml-1 uppercase">Color</label>
+                        <select id="m-color" class="w-full"></select>
+                    </div>
                 </div>
+
                 <div class="text-center">
-                    <p class="text-[10px] text-zinc-500 font-bold mb-1">CANTIDAD</p>
-                    <input type="number" id="m-cant" value="1" min="1" class="w-full bg-transparent text-orange-500 font-black text-4xl text-center outline-none">
+                    <label class="text-[10px] text-zinc-500 font-bold uppercase">Cantidad</label>
+                    <input type="number" id="m-cant" value="1" min="1" class="w-full bg-transparent text-orange-500 font-black text-4xl text-center border-none">
                 </div>
+
                 <button id="btn-add" class="w-full bg-orange-custom text-black font-black py-4 rounded-xl">AÑADIR AL PEDIDO</button>
                 <button id="btn-close" class="w-full text-zinc-600 text-sm font-bold uppercase">Cerrar</button>
             </div>
@@ -88,71 +103,65 @@
 
         document.getElementById('btn-setup').onclick = () => {
             if(prompt("Clave:") === "1234") {
-                const u = prompt("URL del Script:", localStorage.getItem('panchito_url_v3') || "");
-                if(u) { localStorage.setItem('panchito_url_v3', u.trim()); location.reload(); }
+                const u = prompt("URL del Script:", localStorage.getItem('panchito_url_v4') || "");
+                if(u) { localStorage.setItem('panchito_url_v4', u.trim()); location.reload(); }
             }
         };
 
         document.getElementById('btn-login').onclick = function() {
             const user = document.getElementById('vendedor').value;
-            const url = localStorage.getItem('panchito_url_v3');
-            if(!user || !url) return alert("Nombre o URL faltante");
+            const url = localStorage.getItem('panchito_url_v4');
+            if(!user || !url) return alert("Faltan datos");
 
-            this.innerText = "CARGANDO...";
-            
-            fetch(url)
-                .then(r => r.json())
-                .then(data => {
-                    appData = data.productos;
-
-                    // Cargar Logo (Celda A2)
-                    if(data.logo && data.logo.trim() !== "") {
-                        const l = document.getElementById('img-logo');
-                        l.src = data.logo;
-                        l.classList.remove('hidden');
-                        document.getElementById('txt-header').classList.add('hidden');
-                    }
-
-                    // Cargar Banner (Celda B2)
-                    if(data.banner && data.banner.trim() !== "") {
-                        const b = document.getElementById('img-banner');
-                        b.src = data.banner;
-                        document.getElementById('container-banner').classList.remove('hidden');
-                    }
-
-                    // Renderizar Catálogo
-                    const grid = document.getElementById('grid-products');
-                    grid.innerHTML = "";
-                    Object.keys(appData).forEach(key => {
-                        const div = document.createElement('div');
-                        div.className = "card-shoe p-2 rounded-xl text-center shadow-md";
-                        div.innerHTML = `<img src="${appData[key].foto}" class="h-32 w-full object-cover rounded-lg mb-2"><p class="text-[10px] font-bold uppercase truncate">${key}</p>`;
-                        div.onclick = () => {
-                            currentModel = key;
-                            document.getElementById('m-name').innerText = key;
-                            document.getElementById('m-talla').innerHTML = appData[key].tallas.map(t => `<option value="${t}">Talla ${t}</option>`).join('');
-                            document.getElementById('m-color').innerHTML = appData[key].colores.map(c => `<option value="${c}">${c.toUpperCase()}</option>`).join('');
-                            document.getElementById('modal').classList.remove('hidden');
-                        };
-                        grid.appendChild(div);
-                    });
-
-                    document.getElementById('view-login').classList.add('hidden');
-                    document.getElementById('view-catalog').classList.remove('hidden');
-                })
-                .catch(e => { alert("Error al conectar con la base de datos"); this.innerText = "ACCEDER"; });
+            this.innerText = "CONECTANDO...";
+            fetch(url).then(r => r.json()).then(data => {
+                appData = data.productos;
+                if(data.logo) {
+                    document.getElementById('img-logo').src = data.logo;
+                    document.getElementById('img-logo').classList.remove('hidden');
+                    document.getElementById('txt-header').classList.add('hidden');
+                }
+                if(data.banner) {
+                    document.getElementById('img-banner').src = data.banner;
+                    document.getElementById('container-banner').classList.remove('hidden');
+                }
+                const grid = document.getElementById('grid-products');
+                grid.innerHTML = "";
+                Object.keys(appData).forEach(key => {
+                    const div = document.createElement('div');
+                    div.className = "card-shoe p-2 rounded-xl text-center";
+                    div.innerHTML = `<img src="${appData[key].foto}" class="h-32 w-full object-cover rounded-lg mb-2"><p class="text-[10px] font-bold uppercase truncate">${key}</p>`;
+                    div.onclick = () => {
+                        currentModel = key;
+                        document.getElementById('m-name').innerText = key;
+                        document.getElementById('m-talla').innerHTML = appData[key].tallas.map(t => `<option value="${t}">Talla ${t}</option>`).join('');
+                        document.getElementById('m-color').innerHTML = appData[key].colores.map(c => `<option value="${c}">${c.toUpperCase()}</option>`).join('');
+                        document.getElementById('modal').classList.remove('hidden');
+                    };
+                    grid.appendChild(div);
+                });
+                document.getElementById('view-login').classList.add('hidden');
+                document.getElementById('view-catalog').classList.remove('hidden');
+            }).catch(e => { alert("Error de carga"); this.innerText = "ACCEDER"; });
         };
 
         document.getElementById('btn-close').onclick = () => document.getElementById('modal').classList.add('hidden');
 
         document.getElementById('btn-add').onclick = () => {
-            cart.push({ m: currentModel, t: document.getElementById('m-talla').value, c: document.getElementById('m-color').value, n: document.getElementById('m-cant').value, img: appData[currentModel].foto });
+            cart.push({ 
+                m: currentModel, 
+                tipo: document.getElementById('m-tipo').value, 
+                t: document.getElementById('m-talla').value, 
+                c: document.getElementById('m-color').value, 
+                n: document.getElementById('m-cant').value, 
+                img: appData[currentModel].foto 
+            });
             document.getElementById('badge').innerText = cart.length;
             document.getElementById('modal').classList.add('hidden');
         };
 
         document.getElementById('btn-cart-view').onclick = () => {
-            if(cart.length === 0) return alert("El carrito está vacío");
+            if(cart.length === 0) return alert("Vacio");
             document.getElementById('view-catalog').classList.add('hidden');
             document.getElementById('view-cart').classList.remove('hidden');
             const list = document.getElementById('cart-list');
@@ -160,10 +169,10 @@
             cart.forEach((item, idx) => {
                 const div = document.createElement('div');
                 div.className = "bg-zinc-900 p-3 rounded-lg flex justify-between items-center border border-zinc-800";
-                div.innerHTML = `<div><p class="text-xs font-bold">${item.m}</p><p class="text-[10px] text-zinc-500">Talla ${item.t} | ${item.c} | ${item.n} pares</p></div>`;
+                div.innerHTML = `<div><p class="text-xs font-bold uppercase accent-orange">${item.m} (${item.tipo})</p><p class="text-[10px] text-zinc-500">Talla ${item.t} | ${item.c} | ${item.n} pares</p></div>`;
                 const del = document.createElement('button');
-                del.innerText = "BORRAR";
-                del.className = "text-orange-600 text-[10px] font-bold";
+                del.innerText = "QUITAR";
+                del.className = "text-red-500 text-[10px] font-bold";
                 del.onclick = () => { cart.splice(idx,1); document.getElementById('badge').innerText = cart.length; if(cart.length===0) back(); else document.getElementById('btn-cart-view').onclick(); };
                 div.appendChild(del);
                 list.appendChild(div);
@@ -174,12 +183,11 @@
         document.getElementById('btn-back').onclick = back;
 
         document.getElementById('btn-submit').onclick = function() {
-            const url = localStorage.getItem('panchito_url_v3');
+            const url = localStorage.getItem('panchito_url_v4');
             this.innerText = "ENVIANDO...";
             this.disabled = true;
             fetch(url, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ vendedor: document.getElementById('vendedor').value, carrito: cart }) })
-            .then(() => { alert("¡PEDIDO ENVIADO CON ÉXITO!"); location.reload(); })
-            .catch(() => { alert("Error al enviar pedido"); this.disabled = false; });
+            .then(() => { alert("¡PEDIDO ENVIADO!"); location.reload(); });
         };
     </script>
 </body>
