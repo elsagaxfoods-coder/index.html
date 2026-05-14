@@ -3,17 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panchito Shoes | Catálogo</title>
+    <title>Panchito Shoes</title>
+    
+    <!-- Vinculación con tu archivo Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Configuración para Apple / iOS -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Panchito Shoes">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #000000; color: #ffffff; font-family: sans-serif; }
+        body { background-color: #000000; color: #ffffff; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
         .accent-orange { color: #f97316; }
         .bg-orange-custom { background-color: #f97316; }
         .border-orange-custom { border-color: #f97316; }
         .card-shoe { background-color: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 1rem; overflow: hidden; }
         .card-shoe img { width: 100%; height: 130px; object-fit: cover; filter: none !important; }
-        select, input { background-color: #111; border: 1px solid #333; color: white; padding: 12px; border-radius: 8px; outline: none; width: 100%; }
-        select:focus { border-color: #f97316; }
+        select, input { background-color: #111; border: 1px solid #333; color: white; padding: 12px; border-radius: 8px; outline: none; width: 100%; appearance: none; }
     </style>
 </head>
 <body>
@@ -29,22 +38,19 @@
     </header>
 
     <main class="p-4 max-w-md mx-auto">
-        <!-- LOGIN -->
         <div id="view-login" class="mt-20 space-y-6 text-center">
             <h2 class="text-3xl font-bold italic uppercase tracking-tighter">Bienvenido</h2>
             <input type="text" id="vendedor" placeholder="ESCRIBE TU NOMBRE" class="text-center uppercase font-bold text-xl border-orange-custom">
             <button id="btn-login" class="w-full bg-orange-custom text-black font-black py-4 rounded-xl text-lg">ACCEDER</button>
         </div>
 
-        <!-- CATÁLOGO -->
         <div id="view-catalog" class="hidden space-y-4">
             <div id="container-banner" class="hidden w-full rounded-2xl overflow-hidden border border-zinc-800 shadow-lg">
                 <img id="img-banner" src="" class="w-full h-auto object-cover">
             </div>
-            <div id="grid-products" class="grid grid-cols-2 gap-3"></div>
+            <div id="grid-products" class="grid grid-cols-2 gap-3 pb-20"></div>
         </div>
 
-        <!-- CARRITO -->
         <div id="view-cart" class="hidden space-y-4">
             <h2 class="text-orange-500 font-bold text-center italic text-xl uppercase">Tu Pedido</h2>
             <div id="cart-list" class="space-y-2"></div>
@@ -52,29 +58,21 @@
             <button id="btn-back" class="w-full text-zinc-500 text-xs uppercase py-2">← Seguir viendo</button>
         </div>
 
-        <!-- MODAL -->
         <div id="modal" class="hidden fixed inset-0 bg-black/95 flex items-end z-[100]">
             <div class="w-full p-8 bg-zinc-950 rounded-t-[3rem] border-t border-orange-custom space-y-5">
                 <h3 id="m-name" class="text-2xl font-black accent-orange italic uppercase text-center"></h3>
-                
                 <div>
                     <label class="text-[10px] text-zinc-500 font-bold ml-1 uppercase">Opción</label>
-                    <select id="m-tipo">
-                        <option value="Normal">Normal</option>
-                        <option value="Personalizado">Personalizado</option>
-                    </select>
+                    <select id="m-tipo"><option value="Normal">Normal</option><option value="Personalizado">Personalizado</option></select>
                 </div>
-
                 <div class="grid grid-cols-2 gap-4">
                     <div><label class="text-[10px] text-zinc-500 font-bold ml-1 uppercase">Talla</label><select id="m-talla"></select></div>
                     <div><label class="text-[10px] text-zinc-500 font-bold ml-1 uppercase">Color</label><select id="m-color"></select></div>
                 </div>
-
                 <div class="text-center">
                     <label class="text-[10px] text-zinc-500 font-bold uppercase">Cantidad</label>
                     <input type="number" id="m-cant" value="1" min="1" class="text-orange-500 font-black text-4xl text-center bg-transparent border-none">
                 </div>
-
                 <button id="btn-add" class="w-full bg-orange-custom text-black font-black py-4 rounded-xl text-lg">AGREGAR</button>
                 <button id="btn-close" class="w-full text-zinc-600 font-bold text-sm uppercase">Cerrar</button>
             </div>
@@ -83,21 +81,22 @@
 
     <script>
         const URL_DEL_SCRIPT = "https://script.google.com/macros/s/AKfycbyysYqoJnqByfcR7BeOR7Dd0vDeOV2gYqGLUluT_e-tuxSYUhv6Q7t_EpQmKu1YjRYT/exec"; 
-        
-        let appData = {};
-        let cart = [];
-        let currentModel = "";
+        let appData = {}; let cart = []; let currentModel = "";
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+            .then(() => console.log('Service Worker de Panchito Activo'))
+            .catch(err => console.log('Error en sw.js', err));
+        }
 
         document.getElementById('btn-login').onclick = function() {
             const user = document.getElementById('vendedor').value;
             if(!user) return alert("Ingresa tu nombre");
-
             this.innerText = "CARGANDO...";
             fetch(URL_DEL_SCRIPT).then(r => r.json()).then(data => {
                 appData = data.productos;
                 if(data.logo) { document.getElementById('img-logo').src = data.logo; document.getElementById('img-logo').classList.remove('hidden'); document.getElementById('txt-header').classList.add('hidden'); }
                 if(data.banner) { document.getElementById('img-banner').src = data.banner; document.getElementById('container-banner').classList.remove('hidden'); }
-                
                 const grid = document.getElementById('grid-products');
                 grid.innerHTML = "";
                 Object.keys(appData).forEach(key => {
@@ -119,7 +118,6 @@
         };
 
         document.getElementById('btn-close').onclick = () => document.getElementById('modal').classList.add('hidden');
-
         document.getElementById('btn-add').onclick = () => {
             cart.push({ m: currentModel, tipo: document.getElementById('m-tipo').value, t: document.getElementById('m-talla').value, c: document.getElementById('m-color').value, n: document.getElementById('m-cant').value, img: appData[currentModel].foto });
             document.getElementById('badge').innerText = cart.length;
