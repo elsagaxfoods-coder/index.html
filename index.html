@@ -9,187 +9,224 @@
         .bg-dark-app { background-color: #0f172a; }
         .card-dark { background-color: #1e293b; border: 1px solid #334155; }
         .btn-orange { background-color: #f97316; color: white; }
-        .model-card img { width: 100%; height: 110px; object-fit: cover; border-radius: 12px; }
     </style>
 </head>
-<body class="bg-dark-app text-slate-100">
+<body class="bg-dark-app text-slate-100 font-sans">
 
-    <script>
-        // REGISTRO GLOBAL DE FUNCIONES - DEBEN IR AL PRINCIPIO
-        window.db = {};
-        window.cart = [];
-        window.tipoActual = "Normal";
-        window.modeloSeleccionado = "";
-
-        window.config = function() { 
-            const p = prompt("Clave:"); 
-            if(p === "1234") { 
-                const u = prompt("URL de Script:", localStorage.getItem('panchito_url') || ""); 
-                if(u) { 
-                    localStorage.setItem('panchito_url', u.trim()); 
-                    location.reload(); 
-                } 
-            } 
-        };
-
-        window.init = async function() {
-            const user = document.getElementById('user').value.trim();
-            const scriptURL = localStorage.getItem('panchito_url');
-            if(!user || !scriptURL) return alert("Falta nombre o configurar URL en el engranaje ⚙️");
-            
-            document.getElementById('btn-init').innerText = "CONECTANDO...";
-            try {
-                const response = await fetch(scriptURL);
-                const data = await response.json();
-                window.db = data.inventario;[cite: 1, 2]
-                
-                if(data.visuales && data.visuales.logo) { 
-                    document.getElementById('login-logo').src = data.visuales.logo; 
-                    document.getElementById('login-logo').classList.remove('hidden'); 
-                }
-
-                const grid = document.getElementById('grid-modelos');
-                grid.innerHTML = "";
-                Object.keys(window.db).forEach(m => {
-                    grid.innerHTML += `
-                        <div onclick="window.abrirConfig('${m}')" class="card-dark p-2 rounded-2xl model-card cursor-pointer active:scale-95 transition-transform">
-                            <img src="${window.db[m].foto || 'https://via.placeholder.com/150'}" alt="${m}">
-                            <p class="text-[10px] font-bold mt-2 uppercase text-center truncate px-1">${m}</p>
-                        </div>`;
-                });[cite: 2]
-                
-                document.getElementById('p-login').classList.add('hidden');
-                document.getElementById('p-catalogo').classList.remove('hidden');
-            } catch(e) { 
-                alert("Error de conexión. Verifica la URL."); 
-                document.getElementById('btn-init').innerText = "INGRESAR"; 
-            }
-        };
-
-        window.abrirConfig = function(m) {
-            window.modeloSeleccionado = m;
-            document.getElementById('conf-nombre').innerText = m;
-            document.getElementById('conf-img').src = window.db[m].foto || 'https://via.placeholder.com/200';
-            document.getElementById('sel-talla').innerHTML = window.db[m].tallas.map(t => `<option>${t}</option>`).join('');
-            document.getElementById('sel-color').innerHTML = window.db[m].colores.map(c => `<option>${c}</option>`).join('');
-            document.getElementById('p-config').classList.remove('hidden');
-        };
-
-        window.cerrarConfig = function() { document.getElementById('p-config').classList.add('hidden'); };
-
-        window.setTipo = function(t) {
-            window.tipoActual = t;
-            document.getElementById('btn-normal').className = t === 'Normal' ? "flex-1 py-2 rounded-md bg-orange-500 text-xs font-bold" : "flex-1 py-2 text-xs text-slate-500 font-bold";
-            document.getElementById('btn-perso').className = t === 'Personalizado' ? "flex-1 py-2 rounded-md bg-orange-500 text-xs font-bold" : "flex-1 py-2 text-xs text-slate-500 font-bold";
-        };
-
-        window.addToCart = function() {
-            window.cart.push({ m: window.modeloSeleccionado, t: document.getElementById('sel-talla').value, c: document.getElementById('sel-color').value, n: document.getElementById('sel-cant').value, tipo: window.tipoActual, img: window.db[window.modeloSeleccionado].foto || "" });
-            document.getElementById('badge').innerText = window.cart.length;
-            window.cerrarConfig();
-            alert("Modelo añadido");
-        };
-
-        window.verCarrito = function() {
-            if(window.cart.length === 0) return alert("El pedido está vacío");
-            document.getElementById('p-catalogo').classList.add('hidden');
-            document.getElementById('p-carrito').classList.remove('hidden');
-            document.getElementById('cart-list').innerHTML = window.cart.map((i, idx) => `
-                <div class="bg-slate-900 p-3 rounded-2xl flex items-center gap-4 border border-slate-800 text-left">
-                    <img src="${i.img || 'https://via.placeholder.com/50'}" class="w-14 h-14 rounded-lg object-cover">
-                    <div class="flex-1">
-                        <p class="text-xs font-black uppercase">${i.m} <span class="text-orange-500">[${i.tipo}]</span></p>
-                        <p class="text-[10px] text-slate-400">Talla ${i.t} | Color ${i.c} | Cant: ${i.n}</p>
-                    </div>
-                    <button onclick="window.remove(${idx})" class="text-red-500 p-2">✕</button>
-                </div>`).join('');
-        };
-
-        window.remove = function(idx) { 
-            window.cart.splice(idx,1); 
-            document.getElementById('badge').innerText = window.cart.length; 
-            if(window.cart.length === 0) window.back(); else window.verCarrito(); 
-        };
-        
-        window.back = function() { 
-            document.getElementById('p-carrito').classList.add('hidden'); 
-            document.getElementById('p-catalogo').classList.remove('hidden'); 
-        };
-
-        window.sendOrder = async function() {
-            const btn = document.getElementById('btn-send');
-            btn.innerText = "ENVIANDO..."; btn.disabled = true;
-            try {
-                await fetch(localStorage.getItem('panchito_url'), { 
-                    method: 'POST', 
-                    mode: 'no-cors', 
-                    body: JSON.stringify({ vendedor: document.getElementById('user').value, carrito: window.cart }) 
-                });[cite: 1, 2]
-                alert("PEDIDO REGISTRADO"); 
-                window.cart = []; 
-                location.reload();
-            } catch(e) { 
-                alert("Error al enviar"); 
-                btn.innerText = "ENVIAR"; 
-                btn.disabled = false; 
-            }
-        };
-    </script>
-
+    <!-- CABECERA -->
     <header class="bg-[#1e293b] p-4 border-b border-slate-700 sticky top-0 z-50">
         <div class="max-w-md mx-auto flex justify-between items-center">
-            <h1 class="font-black text-lg uppercase">Panchito<span class="text-orange-500">Shoes</span></h1>
-            <div class="flex gap-3">
-                <button onclick="window.verCarrito()" class="relative p-2 bg-slate-800 rounded-full">
-                    🛒 <span id="badge" class="absolute -top-1 -right-1 bg-orange-500 text-[10px] rounded-full h-5 w-5 flex items-center justify-center">0</span>
+            <h1 class="font-bold uppercase tracking-tight">Panchito<span class="text-orange-500">Shoes</span></h1>
+            <div class="flex gap-4">
+                <button id="nav-carrito" class="relative p-2 bg-slate-800 rounded-full">
+                    🛒 <span id="badge" class="absolute -top-1 -right-1 bg-orange-600 text-[10px] rounded-full px-1.5">0</span>
                 </button>
-                <button onclick="window.config()" class="text-slate-500">⚙️</button>
+                <button id="nav-config" class="text-slate-500">⚙️</button>
             </div>
         </div>
     </header>
 
     <main class="max-w-md mx-auto p-4">
-        <section id="p-login" class="mt-10">
-            <div class="card-dark rounded-3xl p-8 text-center">
-                <img id="login-logo" src="" class="w-20 h-20 mx-auto rounded-full mb-4 hidden border-2 border-orange-500">
-                <input type="text" id="user" placeholder="Nombre" class="w-full bg-slate-900 border-2 border-slate-700 p-4 rounded-xl mb-4 text-white text-center outline-none">
-                <button onclick="window.init()" id="btn-init" class="w-full btn-orange py-4 rounded-xl font-bold">INGRESAR AL CATÁLOGO</button>
+        <!-- SECCIÓN: LOGIN -->
+        <section id="sec-login" class="mt-10 space-y-6">
+            <div class="card-dark p-8 rounded-3xl text-center shadow-2xl">
+                <div id="contenedor-logo" class="hidden mb-6">
+                    <img id="img-logo" src="" class="w-24 h-24 mx-auto rounded-full border-2 border-orange-500 p-1">
+                </div>
+                <input type="text" id="input-nombre" placeholder="Ingresa tu nombre" class="w-full bg-slate-900 border border-slate-700 p-4 rounded-xl mb-4 text-white text-center outline-none focus:border-orange-500">
+                <button id="btn-entrar" class="w-full btn-orange py-4 rounded-xl font-bold uppercase shadow-lg active:scale-95 transition-transform">Cargar Catálogo</button>
             </div>
         </section>
 
-        <section id="p-catalogo" class="hidden">
-            <div id="grid-modelos" class="grid grid-cols-2 gap-4"></div>
+        <!-- SECCIÓN: CATÁLOGO -->
+        <section id="sec-catalogo" class="hidden grid grid-cols-2 gap-4 animate-fade-in"></section>
+
+        <!-- SECCIÓN: CARRITO -->
+        <section id="sec-carrito" class="hidden space-y-4">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold">Mi Pedido</h2>
+                <button id="btn-cerrar-carrito" class="text-slate-400 text-sm underline">Volver</button>
+            </div>
+            <div id="lista-pedido" class="space-y-2"></div>
+            <button id="btn-enviar-final" class="w-full bg-emerald-600 py-4 rounded-xl font-bold uppercase shadow-lg">Confirmar Pedido</button>
         </section>
 
-        <section id="p-config" class="hidden fixed inset-0 bg-slate-950/90 z-[60] flex items-end">
-            <div class="w-full bg-[#1e293b] rounded-t-[3rem] p-6 max-h-[90vh] overflow-y-auto">
-                <div class="flex justify-between items-start mb-4">
-                    <h2 id="conf-nombre" class="text-xl font-black uppercase">Detalles</h2>
-                    <button onclick="window.cerrarConfig()" class="text-slate-400 p-2">✕</button>
+        <!-- MODAL SELECCIÓN -->
+        <div id="modal-opciones" class="hidden fixed inset-0 bg-black/80 flex items-end z-[100]">
+            <div class="bg-[#1e293b] w-full p-6 rounded-t-[2.5rem] space-y-5 shadow-2xl">
+                <div class="flex justify-between items-center">
+                    <h3 id="modal-titulo" class="text-xl font-black uppercase tracking-tighter text-orange-500">Modelo</h3>
+                    <button id="btn-cerrar-modal" class="bg-slate-800 p-2 rounded-full text-slate-400">✕</button>
                 </div>
-                <img id="conf-img" src="" class="w-full h-52 object-cover rounded-2xl mb-6 shadow-xl">
                 <div class="space-y-4">
-                    <div class="flex bg-slate-900 p-1 rounded-lg border border-slate-700">
-                        <button onclick="window.setTipo('Normal')" id="btn-normal" class="flex-1 py-2 rounded-md bg-orange-500 text-xs font-bold">NORMAL</button>
-                        <button onclick="window.setTipo('Personalizado')" id="btn-perso" class="flex-1 py-2 text-xs text-slate-500 font-bold">PERSONALIZADO</button>
-                    </div>
                     <div class="grid grid-cols-2 gap-3">
-                        <select id="sel-talla" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-lg text-white"></select>
-                        <select id="sel-color" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-lg text-white"></select>
+                        <select id="sel-talla" class="w-full p-4 bg-slate-900 border border-slate-700 rounded-xl text-white"></select>
+                        <select id="sel-color" class="w-full p-4 bg-slate-900 border border-slate-700 rounded-xl text-white"></select>
                     </div>
-                    <input type="number" id="sel-cant" value="1" min="1" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-lg text-center text-orange-500 font-bold">
-                    <button onclick="window.addToCart()" class="w-full btn-orange py-4 rounded-2xl font-bold shadow-xl">AÑADIR AL PEDIDO</button>
+                    <div>
+                        <label class="text-[10px] uppercase font-bold text-slate-500 ml-1">Cantidad de pares</label>
+                        <input type="number" id="sel-cant" value="1" min="1" class="w-full p-4 bg-slate-900 border border-slate-700 rounded-xl text-center text-orange-500 font-bold text-xl">
+                    </div>
+                    <button id="btn-confirmar-add" class="w-full btn-orange py-4 rounded-2xl font-bold uppercase shadow-xl">Añadir al Carrito</button>
                 </div>
             </div>
-        </section>
-
-        <section id="p-carrito" class="hidden">
-            <div class="card-dark rounded-3xl p-6">
-                <div id="cart-list" class="space-y-3 mb-6"></div>
-                <button onclick="window.sendOrder()" id="btn-send" class="w-full bg-emerald-600 py-4 rounded-xl font-bold">ENVIAR PEDIDO</button>
-                <button onclick="window.back()" class="w-full mt-4 text-xs text-slate-500">Volver al catálogo</button>
-            </div>
-        </section>
+        </div>
     </main>
+
+    <script>
+        // ESTADO DE LA APP[cite: 2]
+        var inventarioGlobal = {};
+        var carritoActual = [];
+        var modeloEnSeleccion = "";
+
+        // CONFIGURACIÓN (ENGRANAJE)
+        document.getElementById('nav-config').onclick = function() {
+            var clave = prompt("Clave de acceso:");
+            if(clave === "1234") {
+                var urlActual = localStorage.getItem('panchito_url') || "";
+                var nuevaUrl = prompt("Pega la URL de tu Google Script:", urlActual);
+                if(nuevaUrl) {
+                    localStorage.setItem('panchito_url', nuevaUrl.trim());
+                    location.reload();
+                }
+            }
+        };
+
+        // INICIO DE SESIÓN Y CARGA DE DATOS
+        document.getElementById('btn-entrar').onclick = async function() {
+            var nombre = document.getElementById('input-nombre').value.trim();
+            var scriptUrl = localStorage.getItem('panchito_url');
+
+            if(!nombre) return alert("Por favor escribe tu nombre.");
+            if(!scriptUrl) return alert("Configura la URL en el engranaje ⚙️ primero.");
+
+            this.innerText = "CONECTANDO...";
+            this.disabled = true;
+
+            try {
+                var respuesta = await fetch(scriptUrl);
+                var datos = await respuesta.json();
+                inventarioGlobal = datos.inventario;[cite: 1, 2]
+
+                // Mostrar logo si existe
+                if(datos.visuales && datos.visuales.logo) {
+                    document.getElementById('img-logo').src = datos.visuales.logo;
+                    document.getElementById('contenedor-logo').classList.remove('hidden');
+                }
+
+                // Construir catálogo
+                var grid = document.getElementById('sec-catalogo');
+                grid.innerHTML = "";
+                
+                Object.keys(inventarioGlobal).forEach(function(nombreItem) {
+                    var card = document.createElement('div');
+                    card.className = "card-dark p-2 rounded-2xl cursor-pointer active:scale-95 transition-transform";
+                    card.innerHTML = '<img src="'+inventarioGlobal[nombreItem].foto+'" class="w-full h-32 object-cover rounded-xl mb-2">' +
+                                     '<p class="text-[10px] font-bold text-center uppercase truncate px-1">'+nombreItem+'</p>';
+                    card.onclick = function() { abrirSeleccion(nombreItem); };
+                    grid.appendChild(card);
+                });[cite: 2]
+
+                document.getElementById('sec-login').classList.add('hidden');
+                document.getElementById('sec-catalogo').classList.remove('hidden');
+            } catch(e) {
+                alert("Error: No se pudo conectar. Revisa la URL del Script.");
+                this.innerText = "Cargar Catálogo";
+                this.disabled = false;
+            }
+        };
+
+        // LÓGICA DEL MODAL
+        function abrirSeleccion(nombre) {
+            modeloEnSeleccion = nombre;
+            document.getElementById('modal-titulo').innerText = nombre;
+            
+            var tSel = document.getElementById('sel-talla');
+            tSel.innerHTML = inventarioGlobal[nombre].tallas.map(function(t) { return '<option>'+t+'</option>'; }).join('');
+            
+            var cSel = document.getElementById('sel-color');
+            cSel.innerHTML = inventarioGlobal[nombre].colores.map(function(c) { return '<option>'+c+'</option>'; }).join('');
+            
+            document.getElementById('modal-opciones').classList.remove('hidden');
+        }
+
+        document.getElementById('btn-cerrar-modal').onclick = function() {
+            document.getElementById('modal-opciones').classList.add('hidden');
+        };
+
+        document.getElementById('btn-confirmar-add').onclick = function() {
+            carritoActual.push({
+                m: modeloEnSeleccion,
+                t: document.getElementById('sel-talla').value,
+                c: document.getElementById('sel-color').value,
+                n: document.getElementById('sel-cant').value,
+                tipo: "Normal",
+                img: inventarioGlobal[modeloEnSeleccion].foto
+            });
+            document.getElementById('badge').innerText = carritoActual.length;
+            document.getElementById('modal-opciones').classList.add('hidden');
+            alert("Añadido correctamente");
+        };
+
+        // LÓGICA DEL CARRITO
+        document.getElementById('nav-carrito').onclick = function() {
+            if(carritoActual.length === 0) return alert("Tu carrito está vacío.");
+            
+            document.getElementById('sec-catalogo').classList.add('hidden');
+            document.getElementById('sec-carrito').classList.remove('hidden');
+            
+            var lista = document.getElementById('lista-pedido');
+            lista.innerHTML = "";
+            
+            carritoActual.forEach(function(item, index) {
+                var fila = document.createElement('div');
+                fila.className = "bg-slate-900 p-4 rounded-2xl flex justify-between items-center border border-slate-800";
+                fila.innerHTML = '<div><p class="font-black text-xs uppercase">'+item.m+'</p>' +
+                                 '<p class="text-[10px] text-slate-400">Talla '+item.t+' | '+item.c+' | '+item.n+' pares</p></div>';
+                
+                var btnBorrar = document.createElement('button');
+                btnBorrar.innerHTML = "✕";
+                btnBorrar.className = "text-red-500 font-bold px-3";
+                btnBorrar.onclick = function() {
+                    carritoActual.splice(index, 1);
+                    document.getElementById('badge').innerText = carritoActual.length;
+                    if(carritoActual.length === 0) cerrarCarrito(); else document.getElementById('nav-carrito').onclick();
+                };
+                
+                fila.appendChild(btnBorrar);
+                lista.appendChild(fila);
+            });
+        };
+
+        function cerrarCarrito() {
+            document.getElementById('sec-carrito').classList.add('hidden');
+            document.getElementById('sec-catalogo').classList.remove('hidden');
+        }
+        document.getElementById('btn-cerrar-carrito').onclick = cerrarCarrito;
+
+        // ENVIAR A GOOGLE SHEETS
+        document.getElementById('btn-enviar-final').onclick = async function() {
+            var urlPost = localStorage.getItem('panchito_url');
+            this.innerText = "ENVIANDO...";
+            this.disabled = true;
+
+            try {
+                await fetch(urlPost, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({
+                        vendedor: document.getElementById('input-nombre').value,
+                        carrito: carritoActual
+                    })
+                });[cite: 1, 2]
+                alert("¡PEDIDO REGISTRADO EXITOSAMENTE!");
+                location.reload();
+            } catch(e) {
+                alert("Error al enviar el pedido.");
+                this.innerText = "Confirmar Pedido";
+                this.disabled = false;
+            }
+        };
+    </script>
 </body>
 </html>
